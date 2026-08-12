@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT2 SBU — Fiber Deployment Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --bg: #F4F6FB;
+    --panel: #FFFFFF;
+    --panel-2: #F1F4FA;
+    --line: #E2E7F3;
+    --text: #1B2333;
+    --text-dim: #5B6478;
+    --text-faint: #8992A8;
+    --cyan: #3B6E86;
+    --cyan-dim: rgba(59,110,134,0.10);
+    --amber: #8B7226;
+    --amber-dim: rgba(139,114,38,0.10);
+    --emerald: #2F5233;
+    --emerald-dim: rgba(47,82,51,0.10);
+    --violet: #4A6C8C;
+    --violet-dim: rgba(74,108,140,0.10);
+    --red: #7A2E2A;
+    --red-dim: rgba(122,46,42,0.10);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(14,156,147,0.06), transparent),
+      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(99,85,214,0.05), transparent),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:36px 24px 80px;}
+
+  /* ---------- Header ---------- */
+  .fiber-line{position:relative;height:2px;background:var(--line);border-radius:2px;margin-bottom:28px;overflow:hidden;}
+  .fiber-line::after{
+    content:'';position:absolute;top:0;left:-20%;width:20%;height:100%;
+    background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+    animation:pulse 3.2s linear infinite;
+  }
+  @keyframes pulse{0%{left:-20%;}100%{left:100%;}}
+  @media (prefers-reduced-motion: reduce){.fiber-line::after{animation:none;left:40%;}}
+
+  header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:8px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;color:var(--cyan);text-transform:uppercase;margin:0 0 8px;}
+  h1{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;margin:0 0 6px;letter-spacing:-0.01em;}
+  .sub{color:var(--text-dim);font-size:14.5px;max-width:520px;line-height:1.5;margin:0;}
+  .sync-box{text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-faint);}
+  .sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 0 rgba(63,207,142,.6);animation:dotpulse 2s infinite;margin-right:6px;}
+  @keyframes dotpulse{0%{box-shadow:0 0 0 0 rgba(63,207,142,.5);}70%{box-shadow:0 0 0 6px rgba(63,207,142,0);}100%{box-shadow:0 0 0 0 rgba(63,207,142,0);}}
+  .refresh-btn{margin-top:6px;background:var(--panel-2);border:1px solid var(--line);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:6px 12px;border-radius:6px;cursor:pointer;transition:border-color .15s;}
+  .refresh-btn:hover{border-color:var(--cyan);}
+  .refresh-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+
+  /* ---------- Funnel flow diagram ---------- */
+  .funnel-flow{position:relative;display:flex;align-items:center;gap:70px;flex-wrap:nowrap;padding:14px 4px 24px;flex-shrink:0;}
+  .funnel-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible;}
+  .flow-box{position:relative;z-index:1;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(27,35,51,0.06);width:210px;flex-shrink:0;}
+  .flow-box-title{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;text-align:center;padding:10px 8px;}
+  .flow-box-row{display:flex;}
+  .flow-box-row > div{flex:1;text-align:center;padding:9px 6px;}
+  .flow-box-row > div:first-child{border-right:1px solid var(--line);}
+  .flow-box-row.header{border-top:1px solid var(--line);}
+  .flow-box-row.header > div{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-dim);background:var(--panel-2);font-weight:600;}
+  .flow-box-row.value > div{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;color:var(--text);border-top:1px solid var(--line);}
+  .download-lanjut-btn{width:100%;background:var(--panel-2);border:none;border-top:1px solid var(--line);color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;padding:8px 6px;cursor:pointer;}
+  .download-lanjut-btn:hover{background:var(--cyan-dim);}
+  .flow-right-col{display:flex;flex-direction:column;gap:24px;position:relative;z-index:1;flex-shrink:0;}
+  .flow-right-col.horizontal{flex-direction:row;gap:20px;}
+  .funnel-flow-wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 40px;}
+  .funnel-flow-wrap .funnel-flow{flex-shrink:1;justify-content:center;}
+  .funnel-flow-wrap .funnel-flow.wide{grid-column:1 / -1;justify-content:flex-start;}
+  @media (max-width:820px){
+    .funnel-flow-wrap{grid-template-columns:1fr;}
+  }
+
+  #reportCapture{background:var(--bg);}
+  .report-header{display:none;padding:4px 2px 18px;}
+  #reportCapture.capturing .report-header{display:block;}
+  .report-header-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;color:var(--text);margin:0 0 2px;}
+  .report-header-date{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin:0;}
+  .download-btn{margin-top:6px;background:var(--cyan);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:7px 14px;border-radius:6px;cursor:pointer;transition:opacity .15s;}
+  .download-btn:hover{opacity:.88;}
+  .download-btn:disabled{opacity:.5;cursor:wait;}
+  .download-btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;}
+
+  /* ---------- KPI ---------- */
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:22px;}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(27,35,51,0.05);}
+  .kpi .accent{position:absolute;top:0;left:0;width:3px;height:100%;}
+  .kpi-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.08em;margin:0 0 8px;}
+  .kpi-value{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;margin:0;}
+  .kpi-sub{font-size:12px;color:var(--text-dim);margin-top:4px;}
+
+  /* ---------- Section ---------- */
+  .section{margin-top:34px;}
+  .section-title{font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600;margin:0 0 4px;}
+  .section-desc{color:var(--text-dim);font-size:13px;margin:0 0 16px;}
+  .section-head-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .metric-toggle{display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:3px;gap:2px;}
+  .metric-toggle button{
+    background:transparent;border:none;color:var(--text-dim);font-family:'Inter',sans-serif;font-size:12.5px;font-weight:500;
+    padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .15s;
+  }
+  .metric-toggle button.active{background:var(--panel);color:var(--text);box-shadow:0 1px 2px rgba(27,35,51,0.08);}
+  .metric-toggle button:hover:not(.active){color:var(--text);}
+  .metric-toggle button:focus-visible{outline:2px solid var(--cyan);outline-offset:1px;}
+
+  .charts-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;}
+  @media (max-width:860px){.charts-grid{grid-template-columns:1fr;}}
+  .chart-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(27,35,51,0.05);}
+  .chart-card h3{font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:600;margin:0 0 14px;color:var(--text);}
+  .chart-card .canvas-wrap{position:relative;height:230px;}
+  .chart-card.wide{grid-column:1 / -1;}
+  .chart-card.wide .canvas-wrap{height:210px;}
+
+  /* ---------- Filters ---------- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+  .filters select, .filters input{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text);
+    font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;border-radius:8px;
+  }
+  .filters input{min-width:200px;flex:1;}
+  .filters select:focus-visible, .filters input:focus-visible{outline:2px solid var(--cyan);outline-offset:1px;}
+  .filters .count{align-self:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-faint);margin-left:auto;}
+
+  /* ---------- Table ---------- */
+  .table-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(27,35,51,0.05);}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{
+    text-align:left;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--text-faint);background:var(--panel-2);padding:10px 14px;border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{padding:10px 14px;border-bottom:1px solid var(--line);color:var(--text-dim);vertical-align:top;}
+  tbody tr:hover{background:rgba(27,35,51,0.025);}
+  tbody td.name{color:var(--text);font-weight:500;}
+  tbody tr.pivot-total td{font-weight:700;color:var(--text);background:var(--panel-2);border-top:2px solid var(--line);}
+  .badge{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .badge-golive{background:var(--emerald-dim);color:var(--emerald);}
+  .badge-godeploy{background:var(--cyan-dim);color:var(--cyan);}
+  .badge-drop{background:var(--red-dim);color:var(--red);}
+  .badge-other{background:var(--panel-2);color:var(--text-dim);}
+  .pager{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-faint);}
+  .pager button{background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:5px 10px;border-radius:6px;cursor:pointer;font-family:inherit;}
+  .pager button:disabled{opacity:.35;cursor:not-allowed;}
+  .pager button:not(:disabled):hover{border-color:var(--cyan);}
+
+  .state-msg{padding:60px 20px;text-align:center;color:var(--text-dim);font-size:14px;}
+  .upload-box{max-width:440px;margin:22px auto 0;border:2px dashed var(--line);border-radius:12px;padding:24px 20px;background:var(--panel);transition:border-color .15s,background .15s;}
+  .upload-box.dragover{border-color:var(--cyan);background:var(--cyan-dim);}
+  .upload-box-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin:0 0 6px;}
+  .upload-box-sub{font-size:12.5px;color:var(--text-dim);margin:0 0 14px;line-height:1.5;}
+  .upload-btn{background:var(--cyan);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:9px 16px;border-radius:6px;cursor:pointer;}
+  .upload-btn:hover{opacity:.88;}
+  .state-msg .err{color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12.5px;margin-top:8px;}
+  footer{margin-top:40px;color:var(--text-faint);font-size:11.5px;font-family:'JetBrains Mono',monospace;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="fiber-line"></div>
+  <header>
+    <div>
+      <p class="eyebrow">PT2 SBU REGIONAL SUMBAGUT</p>
+      <h1>Fiber Deployment Tracker</h1>
+    </div>
+    <div class="sync-box">
+      <div><span class="sync-dot"></span><span id="syncStatus">Menyambungkan...</span></div>
+      <button class="refresh-btn" id="refreshBtn">↻ SEGARKAN DATA</button>
+      <button class="refresh-btn" id="uploadBtnHeader">📁 UPLOAD CSV</button>
+      <a class="refresh-btn" id="openSheetBtn" href="https://docs.google.com/spreadsheets/d/1hOWpIt9_lUf8MG41lbkbIyO19BgmLSezxrnfD5EbVwg/edit" target="_blank" rel="noopener noreferrer" style="text-decoration:none;display:inline-block;">🔗 BUKA GOOGLE SHEET</a>
+      <button class="download-btn" id="downloadBtn">📷 UNDUH LAPORAN + DATA</button>
+    </div>
+  </header>
+
+  <div id="loadingState" class="state-msg">Memuat data produksi dari Google Sheets…</div>
+  <div id="errorState" class="state-msg" style="display:none;">
+    Gagal memuat data otomatis dari Google Sheets.
+    <div class="err" id="errDetail"></div>
+    <p style="margin-top:10px;max-width:480px;margin-left:auto;margin-right:auto;">Kemungkinan penyebab: dibuka lewat file lokal (bukan localhost/server), sheet belum di-share sebagai "Anyone with the link – Viewer", atau publish CSV belum aktif.</p>
+    <div class="upload-box" id="uploadBox">
+      <p class="upload-box-title">Atau upload file CSV manual</p>
+      <p class="upload-box-sub">Export sheet: File → Download → Comma Separated Values (.csv), lalu drop di sini atau klik untuk pilih file.</p>
+      <input type="file" id="csvFileInput" accept=".csv" style="display:none;">
+      <button class="upload-btn" id="uploadBtnTrigger">📁 Pilih File CSV</button>
+    </div>
+  </div>
+
+  <div id="dashboard" style="display:none;">
+
+    <div id="reportCapture">
+
+    <div class="report-header" id="reportHeader">
+      <p class="report-header-title">PT2 SBU — Fiber Deployment Tracker</p>
+      <p class="report-header-date" id="reportHeaderDate"></p>
+    </div>
+
+    <div class="section" style="margin-top:0;">
+      <p class="section-title">Funneling Data</p>
+      <p class="section-desc">Ringkasan alur status proyek dan progres pengukuran.</p>
+
+      <div class="funnel-flow-wrap">
+        <div class="funnel-flow" id="funnelFlow"></div>
+        <div class="funnel-flow" id="funnelFlowGoDeployUkur"></div>
+        <div class="funnel-flow" id="funnelFlowLanjut"></div>
+        <div class="funnel-flow" id="funnelFlowSplitter"></div>
+      </div>
+    </div>
+
+    <div class="kpi-row" id="kpiRow"></div>
+
+    </div>
+
+    <div class="section">
+      <div class="section-head-row">
+        <div>
+          <p class="section-title">Ringkasan Status</p>
+          <p class="section-desc">Berdasarkan seluruh data proyek yang tercatat.</p>
+        </div>
+        <div class="metric-toggle" id="metricToggle">
+          <button data-metric="count">Jumlah LoP/Project</button>
+          <button data-metric="port">Jumlah Port (Actual)</button>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Distribusi Status (STAT FINAL)</h3>
+          <div class="canvas-wrap"><canvas id="chartStatus"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Proyek per Jenis Program (Cek)</h3>
+          <div class="canvas-wrap"><canvas id="chartJenis"></canvas></div>
+        </div>
+        <div class="chart-card wide">
+          <h3>Breakdown per District (Telkomsel Branch) — status bertumpuk</h3>
+          <div class="canvas-wrap" style="height:280px;"><canvas id="chartBranch"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">Tren Go Live per Bulan</p>
+      <p class="section-desc">Sumber: kolom TANGGAL GOLIVE · Tidak ikut pada gambar unduhan laporan.</p>
+      <div class="chart-card">
+        <div class="canvas-wrap"><canvas id="chartTrend"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">Tren Harian Go Live — Bulan Berjalan</p>
+      <p class="section-desc" id="dailyTrendDesc">Sumber: kolom TANGGAL GOLIVE · Tidak ikut pada gambar unduhan laporan.</p>
+      <div class="chart-card">
+        <div class="canvas-wrap"><canvas id="chartTrendDaily"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head-row">
+        <div>
+          <p class="section-title">Produksi Harian per Branch (GL OCC 26)</p>
+          <p class="section-desc" id="glOccDailyStatus">Belum ada file diupload — export data harian per branch (kolom: BRANCH, TANGGAL, JUMLAH PORT), lalu upload di bawah ini.</p>
+        </div>
+      </div>
+      <div class="upload-box" id="uploadBoxGlOccDaily" style="max-width:100%;margin:0 0 16px;">
+        <p class="upload-box-title">Upload CSV data harian per branch</p>
+        <p class="upload-box-sub">Format kolom: BRANCH, TANGGAL, JUMLAH PORT. Drop di sini atau klik untuk pilih file.</p>
+        <input type="file" id="glOccDailyFileInput" accept=".csv" style="display:none;">
+        <button class="upload-btn" id="glOccDailyUploadTrigger">📁 Pilih File CSV</button>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Branch</th>
+              <th>Total Port (bulan berjalan)</th>
+              <th>Hari Aktif</th>
+              <th>AVG Port Harian</th>
+            </tr>
+          </thead>
+          <tbody id="glOccDailyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head-row">
+        <div>
+          <p class="section-title">Detail Data Lanjut (GO)</p>
+          <p class="section-desc" id="lanjutGoTableDesc">Breakdown proyek yang lolos ke tahap Lanjut (GO).</p>
+        </div>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>ID iHLD</th>
+              <th>Nama Proyek</th>
+              <th>Telkomsel Branch</th>
+              <th>ODP</th>
+              <th>Type ODP</th>
+              <th>AVG RXONU</th>
+              <th>UIM Port</th>
+              <th>%OCC</th>
+            </tr>
+          </thead>
+          <tbody id="lanjutGoTableBody"></tbody>
+        </table>
+        <div class="pager">
+          <span id="lanjutGoPageInfo"></span>
+          <div>
+            <button id="lanjutGoPrevPage">← Sebelumnya</button>
+            <button id="lanjutGoNextPage">Selanjutnya →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">Summary Lanjut (GO) per Telkomsel Branch</p>
+      <p class="section-desc">Jumlah ODP dan Port Actual dari data Lanjut (GO), dipecah per district.</p>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Telkomsel Branch</th>
+              <th>Jumlah ODP</th>
+              <th>Total Port Actual</th>
+            </tr>
+          </thead>
+          <tbody id="lanjutGoBranchSummaryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <p class="section-title">Daftar Proyek</p>
+      <p class="section-desc">Cari dan filter untuk melihat detail tiap proyek.</p>
+      <div class="filters">
+        <input type="text" id="searchInput" placeholder="Cari nama proyek atau ID...">
+        <select id="filterStatus"><option value="">Semua Status</option></select>
+        <select id="filterJenis"><option value="">Semua Jenis Program</option></select>
+        <select id="filterBranch"><option value="">Semua District</option></select>
+        <span class="count" id="resultCount"></span>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nama Proyek</th>
+              <th>District</th>
+              <th>Jenis Program (Cek)</th>
+              <th>Status</th>
+              <th>Stat Final</th>
+              <th>Port Actual</th>
+              <th>Tgl Golive</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pager">
+          <span id="pageInfo"></span>
+          <div>
+            <button id="prevPage">← Sebelumnya</button>
+            <button id="nextPage">Selanjutnya →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>DATA DISINKRONKAN LANGSUNG DARI GOOGLE SHEETS (PUBLISHED CSV) · TIDAK ADA DATA YANG DISIMPAN DI SERVER</footer>
+</div>
+
+<script>
+const CSV_URLS = [
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ8qu-mz_zwkjmajcEh8KJlMM5RksBWG6zsXdsPYfSfRdca90BFAmIRecOylofB6UitPXe6fIgrLXmm/pub?gid=1436329857&single=true&output=csv",
+  "https://docs.google.com/spreadsheets/d/1hOWpIt9_lUf8MG41lbkbIyO19BgmLSezxrnfD5EbVwg/gviz/tq?tqx=out:csv&gid=1436329857",
+  "https://docs.google.com/spreadsheets/d/1hOWpIt9_lUf8MG41lbkbIyO19BgmLSezxrnfD5EbVwg/export?format=csv&gid=1436329857"
+];
+
+const COLORS = { golive: '#2F5233', godeploy: '#3B6E86', drop: '#7A2E2A', other: '#8992A8' };
+
+let rows = [];
+let headerMap = {};
+let charts = {};
+let currentPage = 1;
+const PAGE_SIZE = 12;
+let lanjutGoPage = 1;
+const LANJUT_GO_PAGE_SIZE = 12;
+
+function normKey(s){ return (s||'').replace(/\s+/g,' ').trim().toUpperCase(); }
+function get(row, name){
+  const key = headerMap[normKey(name)];
+  return key ? (row[key] || '').toString().trim() : '';
+}
+function getUkurRaw(row){
+  // Coba nama header persis dulu
+  let v = get(row,'UKUR (DONE/NY)');
+  if(v) return v;
+  // Fallback: cari header apapun yang mengandung kata "UKUR"
+  const foundKey = Object.keys(headerMap).find(k=>k.includes('UKUR'));
+  if(foundKey) return (row[headerMap[foundKey]]||'').toString().trim();
+  return '';
+}
+function isDoneUkur(raw){
+  return (raw||'').toUpperCase().includes('DONE');
+}
+function getLanjutRaw(row){
+  let v = get(row,'LANJUT (YES/NO)');
+  if(v) return v;
+  const foundKey = Object.keys(headerMap).find(k=>k.includes('LANJUT'));
+  if(foundKey) return (row[headerMap[foundKey]]||'').toString().trim();
+  return '';
+}
+function isYesLanjut(raw){
+  const s = (raw||'').toUpperCase().trim();
+  if(s.includes('NOT GO') || s.includes('NOGO') || s.includes('NOT-GO')) return false;
+  return s.includes('GO');
+}
+function getSplitterRaw(row){
+  let v = get(row,'SPLITTER');
+  if(v) return v;
+  const foundKey = Object.keys(headerMap).find(k=>k.includes('SPLITTER'));
+  if(foundKey) return (row[headerMap[foundKey]]||'').toString().trim();
+  return '';
+}
+function splitterGroup(row){
+  const raw = getSplitterRaw(row).toString();
+  if(raw.includes('16')) return '1:16';
+  if(raw.includes('12')) return '1:12';
+  return 'Lainnya';
+}
+function parseNum(str){
+  if(!str) return 0;
+  const n = parseFloat(str.toString().replace(/,/g,'').replace(/[^\d.-]/g,''));
+  return isNaN(n) ? 0 : n;
+}
+const MONTH_ABBR = {jan:0,feb:1,mar:2,apr:3,mei:4,may:4,jun:5,jul:6,agu:7,aug:7,sep:8,okt:9,oct:9,nov:10,des:11,dec:11};
+function parseDMY(str){
+  if(!str || str === '-') return null;
+  str = str.toString().trim();
+  const parts = str.split(/[\/\-]/);
+  if(parts.length !== 3) return null;
+  let [d,m,y] = parts.map(p=>p.trim());
+  // Format dengan nama bulan, misal "4-Feb-2026"
+  if(isNaN(parseInt(m))){
+    const monIdx = MONTH_ABBR[m.slice(0,3).toLowerCase()];
+    if(monIdx === undefined) return null;
+    let year = parseInt(y);
+    if(y.length === 2) year += 2000;
+    const date = new Date(year, monIdx, parseInt(d));
+    return isNaN(date.getTime()) ? null : date;
+  }
+  // Format numerik, misal "04/02/2026"
+  if(y.length === 2) y = '20' + y;
+  const date = new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+  return isNaN(date.getTime()) ? null : date;
+}
+function deriveStatus(statFinalRaw){
+  const s = (statFinalRaw||'').toLowerCase().trim();
+  if(!s) return 'Tidak Diketahui';
+  if(s.includes('golive')) return 'Golive';
+  if(s.includes('finish instal') || s.includes('survey mancore') || s.includes('survey maincore')) return 'Go Deploy';
+  if(s.includes('kendala') || s.includes('propose drop')) return 'Drop';
+  return statFinalRaw.trim();
+}
+function statusClass(status){
+  if(status === 'Golive') return 'golive';
+  if(status === 'Go Deploy') return 'godeploy';
+  if(status === 'Drop') return 'drop';
+  return 'other';
+}
+function badgeHTML(status){
+  const cls = statusClass(status);
+  const map = {golive:'badge-golive', godeploy:'badge-godeploy', drop:'badge-drop', other:'badge-other'};
+  return `<span class="badge ${map[cls]}">${status || '—'}</span>`;
+}
+
+async function loadData(){
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('errorState').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('syncStatus').textContent = 'Menyambungkan...';
+
+  let text = null;
+  let lastErr = null;
+  for(const url of CSV_URLS){
+    try{
+      const res = await fetch(url, {cache:'no-store'});
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const t = await res.text();
+      if(t && t.trim().length > 0 && !t.trim().startsWith('<')){
+        text = t;
+        break;
+      }
+      throw new Error('Respons kosong atau bukan CSV');
+    }catch(e){
+      lastErr = e;
+    }
+  }
+
+  if(!text){
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errDetail').textContent = (lastErr && lastErr.message) || 'Semua sumber data gagal diakses';
+    document.getElementById('syncStatus').textContent = 'Gagal tersinkron';
+    return;
+  }
+  processCSVText(text, 'fetch otomatis');
+}
+
+function processCSVText(text, sourceLabel){
+  try{
+    const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+    let newRows = parsed.data.filter(r => Object.values(r).some(v => (v||'').toString().trim() !== ''));
+    if(newRows.length === 0) throw new Error('Data kosong / file CSV tidak valid');
+
+    const newHeaderMap = {};
+    Object.keys(newRows[0]).forEach(k => newHeaderMap[normKey(k)] = k);
+    headerMap = newHeaderMap;
+    rows = newRows;
+
+    // Filter tetap: hanya tampilkan data Telkomsel Regional = SUMBAGUT
+    rows = rows.filter(r => get(r,'Telkomsel Regional').toUpperCase() === 'SUMBAGUT');
+    if(rows.length === 0) throw new Error('Tidak ada baris dengan Telkomsel Regional = SUMBAGUT');
+
+    buildDashboard();
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    const now = new Date();
+    document.getElementById('syncStatus').textContent = (sourceLabel === 'fetch otomatis' ? 'Tersinkron ' : 'Dimuat dari file · ') + now.toLocaleTimeString('id-ID');
+  }catch(err){
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errDetail').textContent = err.message || String(err);
+    document.getElementById('syncStatus').textContent = 'Gagal memuat data';
+  }
+}
+
+function handleCSVFile(file){
+  if(!file) return;
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('errorState').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('syncStatus').textContent = 'Membaca file...';
+  const reader = new FileReader();
+  reader.onload = (e)=> processCSVText(e.target.result, 'upload manual');
+  reader.onerror = ()=>{
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+    document.getElementById('errDetail').textContent = 'Gagal membaca file.';
+  };
+  reader.readAsText(file);
+}
+
+// --- GL OCC 26: data harian per branch (format panjang: BRANCH, TANGGAL, JUMLAH PORT) ---
+function parseGLOccDailyCSV(text){
+  const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+  const dataRows = parsed.data;
+  if(dataRows.length === 0) return null;
+
+  const localHeaderMap = {};
+  Object.keys(dataRows[0]).forEach(k => localHeaderMap[normKey(k)] = k);
+  const branchKey = localHeaderMap[normKey('BRANCH')];
+  const tglKey = localHeaderMap[normKey('TANGGAL')];
+  const portKey = localHeaderMap[normKey('JUMLAH PORT')];
+  if(!branchKey || !portKey) return null;
+
+  const dateSet = new Set();
+  const byBranch = {};
+  dataRows.forEach(r=>{
+    const branch = (r[branchKey]||'').toString().trim();
+    if(!branch) return;
+    const tgl = tglKey ? (r[tglKey]||'').toString().trim() : '';
+    const port = parseFloat((r[portKey]||'0').toString().replace(/,/g,'').trim()) || 0;
+    if(tgl) dateSet.add(tgl);
+    if(!byBranch[branch]) byBranch[branch] = { total:0, activeDays:0 };
+    byBranch[branch].total += port;
+    if(port > 0) byBranch[branch].activeDays += 1;
+  });
+
+  return { byBranch, totalDays: dateSet.size || 1 };
+}
+
+function renderGLOccDailyTable(result){
+  const tbody = document.getElementById('glOccDailyTableBody');
+  if(!tbody) return;
+  const branches = Object.keys(result.byBranch).sort((a,b)=> result.byBranch[b].total - result.byBranch[a].total);
+  const totalDays = result.totalDays;
+  let grandTotal = 0;
+
+  tbody.innerHTML = branches.map(b=>{
+    const data = result.byBranch[b];
+    grandTotal += data.total;
+    const avgDaily = data.total / totalDays;
+    return `
+    <tr>
+      <td class="name">${b}</td>
+      <td>${data.total.toLocaleString('id-ID')}</td>
+      <td>${data.activeDays}/${totalDays}</td>
+      <td>${avgDaily.toLocaleString('id-ID', {maximumFractionDigits:1})}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="4" style="text-align:center;padding:30px;">Tidak ada data.</td></tr>`;
+
+  if(branches.length){
+    const grandAvg = grandTotal / totalDays;
+    tbody.innerHTML += `
+    <tr class="pivot-total">
+      <td class="name">TOTAL</td>
+      <td>${grandTotal.toLocaleString('id-ID')}</td>
+      <td>${totalDays} hari data</td>
+      <td>${grandAvg.toLocaleString('id-ID', {maximumFractionDigits:1})}</td>
+    </tr>`;
+  }
+}
+
+function handleGLOccDailyFile(file){
+  if(!file) return;
+  document.getElementById('glOccDailyStatus').textContent = 'Membaca file...';
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const result = parseGLOccDailyCSV(e.target.result);
+      if(!result || Object.keys(result.byBranch).length === 0){
+        document.getElementById('glOccDailyStatus').textContent = '⚠ Tidak menemukan kolom BRANCH/TANGGAL/JUMLAH PORT yang valid di file ini.';
+        return;
+      }
+      const now = new Date();
+      document.getElementById('glOccDailyStatus').textContent = `✓ ${Object.keys(result.byBranch).length} branch · ${result.totalDays} hari data · dimuat ${now.toLocaleTimeString('id-ID')}`;
+      renderGLOccDailyTable(result);
+    }catch(err){
+      document.getElementById('glOccDailyStatus').textContent = '⚠ Gagal membaca file: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+let currentMetric = 'count'; // 'count' | 'port'
+let AGG = null; // cache hasil agregasi biar toggle tidak perlu hitung ulang
+
+function buildDashboard(){
+  const statusAgg = {};
+  const jenisAgg = {};
+  const branchAgg = {};
+  const monthAgg = {};
+  const dayAgg = {};
+  const now0 = new Date();
+  const curYear = now0.getFullYear();
+  const curMonth = now0.getMonth();
+  const overall = {
+    total:{count:0, port:0},
+    golive:{count:0, port:0},
+    godeploy:{count:0, port:0},
+    drop:{count:0, port:0}
+  };
+  const bump = (obj, port)=>{ obj.count += 1; obj.port += port; };
+  const emptyBucket = ()=>({golive:{count:0,port:0}, godeploy:{count:0,port:0}, drop:{count:0,port:0}, other:{count:0,port:0}});
+
+  rows.forEach(row=>{
+    const status = deriveStatus(get(row,'STAT FINAL'));
+    const jenis = get(row,'JENIS PROGRAM CEK') || 'Tidak Diketahui';
+    const branch = get(row,'Telkomsel Branch') || 'Tidak Diketahui';
+    const portActual = parseNum(get(row,'PORT ACTUAL'));
+
+    bump(overall.total, portActual);
+
+    if(!statusAgg[status]) statusAgg[status] = {count:0, port:0};
+    bump(statusAgg[status], portActual);
+
+    if(!jenisAgg[jenis]) jenisAgg[jenis] = {count:0, port:0};
+    bump(jenisAgg[jenis], portActual);
+
+    const sCls = statusClass(status);
+    if(overall[sCls]) bump(overall[sCls], portActual);
+
+    if(!branchAgg[branch]) branchAgg[branch] = emptyBucket();
+    bump(branchAgg[branch][sCls] || branchAgg[branch].other, portActual);
+
+    const glRaw = get(row,'TANGGAL GOLIVE') || get(row,'TGL GOLIVE');
+    const gl = parseDMY(glRaw);
+    if(gl && gl.getFullYear() === 2026){
+      const key = gl.getFullYear() + '-' + String(gl.getMonth()+1).padStart(2,'0');
+      if(!monthAgg[key]) monthAgg[key] = {count:0, port:0};
+      bump(monthAgg[key], portActual);
+    }
+    if(gl && gl.getFullYear() === curYear && gl.getMonth() === curMonth){
+      const dayKey = gl.getDate();
+      if(!dayAgg[dayKey]) dayAgg[dayKey] = {count:0, port:0};
+      bump(dayAgg[dayKey], portActual);
+    }
+  });
+
+  const ukurAgg = { done:{count:0,port:0}, belum:{count:0,port:0} };
+  const ukurGoDeployAgg = { done:{count:0,port:0}, belum:{count:0,port:0} };
+  const lanjutAgg = { yes:{count:0,port:0}, no:{count:0,port:0} };
+  const splitterAgg = { '1:12':{count:0,port:0}, '1:16':{count:0,port:0}, 'Lainnya':{count:0,port:0} };
+  const lanjutGoRows = [];
+  rows.forEach(row=>{
+    const raw = getUkurRaw(row);
+    const port = parseNum(get(row,'PORT ACTUAL'));
+    const key = isDoneUkur(raw) ? 'done' : 'belum';
+    ukurAgg[key].count += 1;
+    ukurAgg[key].port += port;
+
+    const status = deriveStatus(get(row,'STAT FINAL'));
+    const isGoDeploy = statusClass(status) === 'godeploy';
+    if(isGoDeploy){
+      ukurGoDeployAgg[key].count += 1;
+      ukurGoDeployAgg[key].port += port;
+
+      if(key === 'done'){
+        const lanjutRaw = getLanjutRaw(row);
+        const lKey = isYesLanjut(lanjutRaw) ? 'yes' : 'no';
+        lanjutAgg[lKey].count += 1;
+        lanjutAgg[lKey].port += port;
+
+        if(lKey === 'yes'){
+          const sGroup = splitterGroup(row);
+          splitterAgg[sGroup].count += 1;
+          splitterAgg[sGroup].port += port;
+          lanjutGoRows.push(row);
+        }
+      }
+    }
+  });
+
+  AGG = { overall, statusAgg, jenisAgg, branchAgg, ukurAgg, ukurGoDeployAgg, lanjutAgg, splitterAgg, monthAgg, dayAgg, curYear, curMonth, lanjutGoRows };
+
+  FUNNEL = buildFunnelAgg();
+
+  setupMetricToggle();
+  renderAllMetricViews();
+  setupFilters();
+  currentPage = 1;
+  renderTable();
+  lanjutGoPage = 1;
+  renderLanjutGoTable();
+  renderLanjutGoBranchSummary();
+}
+
+const JENIS_GROUPS = ['JPP','Non FBB','EXPAND','UNTSEL','Lainnya'];
+const JENIS_COLORS = { 'JPP':'#3B6E86', 'Non FBB':'#4A6C8C', 'EXPAND':'#2F5233', 'UNTSEL':'#8B7226', 'Lainnya':'#8992A8' };
+let FUNNEL = null;
+
+function mapJenisGroup(raw){
+  const s = (raw||'').toLowerCase().trim();
+  if(!s) return 'Lainnya';
+  if(s.includes('non fbb') || s.includes('nonfbb') || s.includes('non-fbb')) return 'Non FBB';
+  if(s.includes('jpp')) return 'JPP';
+  if(s.includes('expand')) return 'EXPAND';
+  if(s.includes('untsel') || s.includes('unsc')) return 'UNTSEL';
+  return 'Lainnya';
+}
+
+function buildFunnelAgg(){
+  const emptyGroup = () => Object.fromEntries(JENIS_GROUPS.map(g=>[g,{odp:0,port:0}]));
+  const stages = {golive:{}, godeploy:{}, drop:{}};
+  rows.forEach(row=>{
+    const branch = get(row,'Telkomsel Branch') || 'Tidak Diketahui';
+    const jenisGroup = mapJenisGroup(get(row,'JENIS PROGRAM CEK'));
+    const status = deriveStatus(get(row,'STAT FINAL'));
+    const cls = statusClass(status);
+    const port = parseNum(get(row,'PORT ACTUAL'));
+    const stageObj = stages[cls];
+    if(!stageObj) return; // status "Lainnya" tidak masuk funnel tahap manapun
+    if(!stageObj[branch]) stageObj[branch] = emptyGroup();
+    stageObj[branch][jenisGroup].odp += 1;
+    stageObj[branch][jenisGroup].port += port;
+  });
+  return stages;
+}
+
+function funnelVal(obj){ return currentMetric === 'port' ? obj.port : obj.odp; }
+
+function renderFunnelFlow(){
+  const stages = [
+    {key:'godeploy', label:'GO DEPLOY', color:'#8B7226'},
+    {key:'golive', label:'GOLIVE', color:'#2F5233'},
+    {key:'drop', label:'DROP', color:'#7A2E2A'},
+  ];
+
+  const boxHTML = (title, color, odp, port)=>`
+    <div class="flow-box">
+      <div class="flow-box-title" style="background:${color}">${title}</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${odp.toLocaleString('id-ID')}</div><div>${port.toLocaleString('id-ID')}</div></div>
+    </div>`;
+
+  const allOdp = AGG.overall.total.count;
+  const allPort = AGG.overall.total.port;
+
+  const rightBoxesHTML = stages.map(s=>{
+    const data = FUNNEL[s.key];
+    let odp = 0, port = 0;
+    Object.values(data).forEach(branchObj=>{
+      JENIS_GROUPS.forEach(g=>{ odp += branchObj[g].odp; port += branchObj[g].port; });
+    });
+    return boxHTML(s.label, s.color, odp, port);
+  }).join('');
+
+  document.getElementById('funnelFlow').innerHTML = `
+    <svg id="funnelSvg" class="funnel-svg"></svg>
+    <div class="flow-box" id="flowBoxAll">
+      <div class="flow-box-title" style="background:#1B2A4A">ALL DAPROS PT2 SBU</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${allOdp.toLocaleString('id-ID')}</div><div>${allPort.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div class="flow-right-col" id="flowRightCol">${rightBoxesHTML}</div>`;
+
+  requestAnimationFrame(()=>drawFunnelConnectors('funnelFlow','funnelSvg','flowBoxAll','flowRightCol'));
+}
+
+function renderFunnelFlowGoDeployUkur(){
+  const boxHTML = (title, color, odp, port)=>`
+    <div class="flow-box">
+      <div class="flow-box-title" style="background:${color}">${title}</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${odp.toLocaleString('id-ID')}</div><div>${port.toLocaleString('id-ID')}</div></div>
+    </div>`;
+
+  let goDeployOdp = 0, goDeployPort = 0;
+  Object.values(FUNNEL.godeploy).forEach(branchObj=>{
+    JENIS_GROUPS.forEach(g=>{ goDeployOdp += branchObj[g].odp; goDeployPort += branchObj[g].port; });
+  });
+
+  const rightBoxesHTML = [
+    boxHTML('DONE UKUR', '#2F5233', AGG.ukurGoDeployAgg.done.count, AGG.ukurGoDeployAgg.done.port),
+    boxHTML('BELUM UKUR', '#8B7226', AGG.ukurGoDeployAgg.belum.count, AGG.ukurGoDeployAgg.belum.port),
+  ].join('');
+
+  document.getElementById('funnelFlowGoDeployUkur').innerHTML = `
+    <svg id="funnelSvgGoDeployUkur" class="funnel-svg"></svg>
+    <div class="flow-box" id="flowBoxAllGoDeployUkur">
+      <div class="flow-box-title" style="background:#8B7226">GO DEPLOY</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${goDeployOdp.toLocaleString('id-ID')}</div><div>${goDeployPort.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div class="flow-right-col" id="flowRightColGoDeployUkur">${rightBoxesHTML}</div>`;
+
+  requestAnimationFrame(()=>drawFunnelConnectors('funnelFlowGoDeployUkur','funnelSvgGoDeployUkur','flowBoxAllGoDeployUkur','flowRightColGoDeployUkur'));
+}
+
+function renderFunnelFlowLanjut(){
+  const boxHTML = (title, color, odp, port)=>`
+    <div class="flow-box">
+      <div class="flow-box-title" style="background:${color}">${title}</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${odp.toLocaleString('id-ID')}</div><div>${port.toLocaleString('id-ID')}</div></div>
+    </div>`;
+
+  const rightBoxesHTML = [
+    boxHTML('LANJUT (GO)', '#3B6E86', AGG.lanjutAgg.yes.count, AGG.lanjutAgg.yes.port),
+    boxHTML('LANJUT (NOT GO)', '#7A2E2A', AGG.lanjutAgg.no.count, AGG.lanjutAgg.no.port),
+  ].join('');
+
+  document.getElementById('funnelFlowLanjut').innerHTML = `
+    <svg id="funnelSvgLanjut" class="funnel-svg"></svg>
+    <div class="flow-box" id="flowBoxAllLanjut">
+      <div class="flow-box-title" style="background:#2F5233">DONE UKUR</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${AGG.ukurGoDeployAgg.done.count.toLocaleString('id-ID')}</div><div>${AGG.ukurGoDeployAgg.done.port.toLocaleString('id-ID')}</div></div>
+    </div>
+    <div class="flow-right-col" id="flowRightColLanjut">${rightBoxesHTML}</div>`;
+
+  requestAnimationFrame(()=>drawFunnelConnectors('funnelFlowLanjut','funnelSvgLanjut','flowBoxAllLanjut','flowRightColLanjut'));
+}
+
+function renderLanjutGoTable(){
+  const rowsData = (AGG && AGG.lanjutGoRows) ? AGG.lanjutGoRows : [];
+  const tbody = document.getElementById('lanjutGoTableBody');
+  const descEl = document.getElementById('lanjutGoTableDesc');
+  if(!tbody) return;
+
+  if(descEl) descEl.textContent = `Breakdown proyek yang lolos ke tahap Lanjut (GO) — ${rowsData.length.toLocaleString('id-ID')} data.`;
+
+  const totalPages = Math.max(1, Math.ceil(rowsData.length / LANJUT_GO_PAGE_SIZE));
+  if(lanjutGoPage > totalPages) lanjutGoPage = totalPages;
+  const pageRows = rowsData.slice((lanjutGoPage-1)*LANJUT_GO_PAGE_SIZE, lanjutGoPage*LANJUT_GO_PAGE_SIZE);
+
+  tbody.innerHTML = pageRows.map(row=>`
+    <tr>
+      <td>${get(row,'iHLD LoP ID')||'—'}</td>
+      <td class="name">${get(row,'Nama Proyek')||'—'}</td>
+      <td>${get(row,'Telkomsel Branch')||'—'}</td>
+      <td>${get(row,'LABEL ODP')||'—'}</td>
+      <td>${get(row,'JENIS ODP')||'—'}</td>
+      <td>${get(row,'AVG RXONU')||'—'}</td>
+      <td>${get(row,'UIM PORT')||'—'}</td>
+      <td>${get(row,'%OCC')||'—'}</td>
+    </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:30px;">Belum ada data Lanjut (GO).</td></tr>`;
+
+  const pageInfoEl = document.getElementById('lanjutGoPageInfo');
+  const prevBtn = document.getElementById('lanjutGoPrevPage');
+  const nextBtn = document.getElementById('lanjutGoNextPage');
+  if(pageInfoEl) pageInfoEl.textContent = `Halaman ${lanjutGoPage} dari ${totalPages}`;
+  if(prevBtn) prevBtn.disabled = lanjutGoPage <= 1;
+  if(nextBtn) nextBtn.disabled = lanjutGoPage >= totalPages;
+}
+
+function renderLanjutGoBranchSummary(){
+  const tbody = document.getElementById('lanjutGoBranchSummaryBody');
+  if(!tbody) return;
+  const rowsData = (AGG && AGG.lanjutGoRows) ? AGG.lanjutGoRows : [];
+
+  const byBranch = {};
+  rowsData.forEach(row=>{
+    const branch = get(row,'Telkomsel Branch') || 'Tidak Diketahui';
+    if(!byBranch[branch]) byBranch[branch] = { odp:0, port:0 };
+    byBranch[branch].odp += 1;
+    byBranch[branch].port += parseNum(get(row,'PORT ACTUAL'));
+  });
+
+  const branches = Object.keys(byBranch).sort((a,b)=> byBranch[b].odp - byBranch[a].odp);
+  const totalOdp = branches.reduce((s,b)=>s+byBranch[b].odp,0);
+  const totalPort = branches.reduce((s,b)=>s+byBranch[b].port,0);
+
+  tbody.innerHTML = branches.map(b=>`
+    <tr>
+      <td class="name">${b}</td>
+      <td>${byBranch[b].odp.toLocaleString('id-ID')}</td>
+      <td>${byBranch[b].port.toLocaleString('id-ID')}</td>
+    </tr>`).join('') || `<tr><td colspan="3" style="text-align:center;padding:30px;">Belum ada data Lanjut (GO).</td></tr>`;
+
+  if(branches.length){
+    tbody.innerHTML += `
+    <tr class="pivot-total">
+      <td class="name">TOTAL</td>
+      <td>${totalOdp.toLocaleString('id-ID')}</td>
+      <td>${totalPort.toLocaleString('id-ID')}</td>
+    </tr>`;
+  }
+}
+
+function downloadLanjutGoExcel(){
+  if(!AGG || !AGG.lanjutGoRows || AGG.lanjutGoRows.length === 0){
+    alert('Tidak ada data Lanjut (GO) untuk diunduh.');
+    return;
+  }
+  const columns = [
+    'iHLD LoP ID', 'Telkomsel Branch', 'Jenis Program',
+    'LABEL ODP', 'JENIS ODP', 'AVG RXONU', 'LENGTH', 'UIM PORT', 'SPLITTER'
+  ];
+  const aoa = [columns, ...AGG.lanjutGoRows.map(row => columns.map(col => get(row, col)))];
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = columns.map(c => ({ wch: Math.max(c.length + 2, 14) }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Lanjut GO');
+  const now = new Date();
+  XLSX.writeFile(wb, `lanjut-go-${now.toISOString().slice(0,10)}.xlsx`);
+}
+
+function renderFunnelFlowSplitter(){
+  const boxHTML = (title, color, odp, port)=>`
+    <div class="flow-box">
+      <div class="flow-box-title" style="background:${color}">${title}</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${odp.toLocaleString('id-ID')}</div><div>${port.toLocaleString('id-ID')}</div></div>
+    </div>`;
+
+  const rightBoxesHTML = [
+    boxHTML('SPLITTER 1:12', '#4A6C8C', AGG.splitterAgg['1:12'].count, AGG.splitterAgg['1:12'].port),
+    boxHTML('SPLITTER 1:16', '#3B6E86', AGG.splitterAgg['1:16'].count, AGG.splitterAgg['1:16'].port),
+  ].join('');
+
+  const lainnyaCount = AGG.splitterAgg['Lainnya'].count;
+  const lainnyaNote = lainnyaCount > 0
+    ? `<p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);margin:8px 0 0;">⚠ ${lainnyaCount.toLocaleString('id-ID')} data dalam subset ini punya format SPLITTER yang tidak dikenali (bukan 1:12/1:16), tidak masuk kotak manapun.</p>`
+    : '';
+
+  document.getElementById('funnelFlowSplitter').innerHTML = `
+    <svg id="funnelSvgSplitter" class="funnel-svg"></svg>
+    <div class="flow-box" id="flowBoxAllSplitter">
+      <div class="flow-box-title" style="background:#0E9C93">LANJUT (GO)</div>
+      <div class="flow-box-row header"><div>ODP</div><div>PORT</div></div>
+      <div class="flow-box-row value"><div>${AGG.lanjutAgg.yes.count.toLocaleString('id-ID')}</div><div>${AGG.lanjutAgg.yes.port.toLocaleString('id-ID')}</div></div>
+      <button class="download-lanjut-btn" id="downloadLanjutGoBtn" type="button">⬇ Download Excel (${AGG.lanjutGoRows.length})</button>
+    </div>
+    <div class="flow-right-col" id="flowRightColSplitter">${rightBoxesHTML}</div>
+    ${lainnyaNote}`;
+
+  const dlBtn = document.getElementById('downloadLanjutGoBtn');
+  if(dlBtn) dlBtn.onclick = downloadLanjutGoExcel;
+
+  requestAnimationFrame(()=>drawFunnelConnectors('funnelFlowSplitter','funnelSvgSplitter','flowBoxAllSplitter','flowRightColSplitter'));
+}
+
+function drawFunnelConnectors(containerId, svgId, leftBoxId, rightColId){
+  const container = document.getElementById(containerId);
+  const svg = document.getElementById(svgId);
+  const leftBox = document.getElementById(leftBoxId);
+  const rightBoxes = document.querySelectorAll(`#${rightColId} .flow-box`);
+  if(!container || !svg || !leftBox || rightBoxes.length===0) return;
+
+  const cRect = container.getBoundingClientRect();
+  if(cRect.width === 0) return;
+  svg.setAttribute('viewBox', `0 0 ${cRect.width} ${cRect.height}`);
+
+  const lRect = leftBox.getBoundingClientRect();
+  const startX = lRect.right - cRect.left;
+  const startY = lRect.top - cRect.top + lRect.height/2;
+
+  let paths = '';
+  rightBoxes.forEach(box=>{
+    const r = box.getBoundingClientRect();
+    const endX = r.left - cRect.left;
+    const endY = r.top - cRect.top + r.height/2;
+    const midX = (startX + endX) / 2;
+    paths += `<path d="M ${startX} ${startY} C ${midX} ${startY}, ${midX} ${endY}, ${endX} ${endY}" stroke="#C9D0E3" stroke-width="1.5" fill="none"/>`;
+  });
+  svg.innerHTML = paths;
+}
+
+window.addEventListener('resize', ()=>{
+  if(FUNNEL) drawFunnelConnectors('funnelFlow','funnelSvg','flowBoxAll','flowRightCol');
+  if(AGG && AGG.ukurGoDeployAgg) drawFunnelConnectors('funnelFlowGoDeployUkur','funnelSvgGoDeployUkur','flowBoxAllGoDeployUkur','flowRightColGoDeployUkur');
+  if(AGG && AGG.lanjutAgg) drawFunnelConnectors('funnelFlowLanjut','funnelSvgLanjut','flowBoxAllLanjut','flowRightColLanjut');
+  if(AGG && AGG.splitterAgg) drawFunnelConnectors('funnelFlowSplitter','funnelSvgSplitter','flowBoxAllSplitter','flowRightColSplitter');
+});
+
+function renderFunnelCharts(){
+  if(!FUNNEL) return;
+  renderFunnelFlow();
+  renderFunnelFlowGoDeployUkur();
+  renderFunnelFlowLanjut();
+  renderFunnelFlowSplitter();
+}
+
+function setupMetricToggle(){
+  const el = document.getElementById('metricToggle');
+  if(!el) return;
+  el.querySelectorAll('button').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.metric === currentMetric);
+    btn.onclick = ()=>{
+      currentMetric = btn.dataset.metric;
+      el.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b===btn));
+      renderAllMetricViews();
+    };
+  });
+}
+
+function val(obj){ return currentMetric === 'port' ? (obj?.port||0) : (obj?.count||0); }
+
+function renderAllMetricViews(){
+  if(!AGG) return;
+  renderFunnelCharts();
+  renderKPIs(AGG.overall);
+  renderStatusChart(AGG.statusAgg);
+  renderJenisChart(AGG.jenisAgg);
+  renderBranchChart(AGG.branchAgg);
+  renderTrendChart(AGG.monthAgg);
+  renderTrendDailyChart(AGG.dayAgg, AGG.curYear, AGG.curMonth);
+}
+
+const TARGET_PORT = 33399;
+
+function renderKPIs(overall){
+  const unitLabel = currentMetric === 'port' ? 'Port' : 'Proyek';
+  const total = val(overall.total);
+  const golivePort = overall.golive.port;
+  const targetPct = ((golivePort / TARGET_PORT) * 100).toFixed(2);
+  const kpis = [
+    {label:`Total ${unitLabel}`, value: total.toLocaleString('id-ID'), color:'var(--text)'},
+    {label:'Golive', value: val(overall.golive).toLocaleString('id-ID'), sub:`Target Port: ${TARGET_PORT.toLocaleString('id-ID')} · Tercapai ${targetPct}%`, color:'var(--emerald)'},
+    {label:'Go Deploy', value: val(overall.godeploy).toLocaleString('id-ID'), color:'var(--cyan)'},
+    {label:'Drop', value: val(overall.drop).toLocaleString('id-ID'), sub:'Kendala / Propose Drop', color:'var(--red)'},
+  ];
+  document.getElementById('kpiRow').innerHTML = kpis.map(k=>`
+    <div class="kpi">
+      <div class="accent" style="background:${k.color}"></div>
+      <p class="kpi-label">${k.label}</p>
+      <p class="kpi-value">${k.value}</p>
+      ${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}
+    </div>`).join('');
+}
+
+function baseChartOptions(){
+  return {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color:'#5B6478', font:{family:'Inter', size:11.5} } } },
+    scales:{
+      x:{ ticks:{color:'#5B6478', font:{family:'JetBrains Mono', size:10.5}}, grid:{color:'#EDF0F8'} },
+      y:{ ticks:{color:'#5B6478', font:{family:'JetBrains Mono', size:10.5}}, grid:{color:'#EDF0F8'} }
+    }
+  };
+}
+
+function renderStatusChart(agg){
+  if(charts.status) charts.status.destroy();
+  const labels = Object.keys(agg);
+  const data = labels.map(l=>val(agg[l]));
+  const colorMap = labels.map(l=> COLORS[statusClass(l)] || COLORS.other);
+  charts.status = new Chart(document.getElementById('chartStatus'), {
+    type:'doughnut',
+    data:{ labels, datasets:[{ data, backgroundColor: colorMap, borderColor:'#FFFFFF', borderWidth:2 }] },
+    options:{ responsive:true, maintainAspectRatio:false, cutout:'62%',
+      plugins:{ legend:{ position:'bottom', labels:{ color:'#5B6478', font:{family:'Inter', size:11.5}, padding:12 } } } }
+  });
+}
+
+function renderJenisChart(agg){
+  if(charts.jenis) charts.jenis.destroy();
+  const entries = Object.entries(agg).map(([k,v])=>[k, val(v)]).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  charts.jenis = new Chart(document.getElementById('chartJenis'), {
+    type:'bar',
+    data:{ labels: entries.map(e=> e[0].length>22? e[0].slice(0,22)+'…' : e[0]),
+      datasets:[{ data: entries.map(e=>e[1]), backgroundColor:'#3B6E86', borderRadius:5, maxBarThickness:26 }] },
+    options:{ ...baseChartOptions(), indexAxis:'y', plugins:{legend:{display:false}} }
+  });
+}
+
+function renderBranchChart(branchAgg){
+  if(charts.branch) charts.branch.destroy();
+  const branches = Object.keys(branchAgg).sort((a,b)=>{
+    const totalA = ['golive','godeploy','drop','other'].reduce((s,k)=>s+val(branchAgg[a][k]),0);
+    const totalB = ['golive','godeploy','drop','other'].reduce((s,k)=>s+val(branchAgg[b][k]),0);
+    return totalB - totalA;
+  }).slice(0,15);
+  charts.branch = new Chart(document.getElementById('chartBranch'), {
+    type:'bar',
+    data:{ labels: branches,
+      datasets:[
+        { label:'Golive', data: branches.map(w=>val(branchAgg[w].golive)), backgroundColor: COLORS.golive, stack:'s' },
+        { label:'Go Deploy', data: branches.map(w=>val(branchAgg[w].godeploy)), backgroundColor: COLORS.godeploy, stack:'s' },
+        { label:'Drop', data: branches.map(w=>val(branchAgg[w].drop)), backgroundColor: COLORS.drop, stack:'s' },
+        { label:'Lainnya', data: branches.map(w=>val(branchAgg[w].other)), backgroundColor: COLORS.other, stack:'s' },
+      ]},
+    options:{ ...baseChartOptions(),
+      scales:{ x:{ stacked:true, ticks:{color:'#5B6478', font:{family:'JetBrains Mono', size:10.5}}, grid:{display:false} },
+               y:{ stacked:true, ticks:{color:'#5B6478', font:{family:'JetBrains Mono', size:10.5}}, grid:{color:'#EDF0F8'} } } }
+  });
+}
+
+function renderTrendChart(monthAgg){
+  if(charts.trend) charts.trend.destroy();
+  const sortedKeys = Object.keys(monthAgg).sort();
+  const labels = sortedKeys.map(k=>{
+    const [y,m] = k.split('-');
+    return new Date(y, m-1).toLocaleDateString('id-ID', {month:'short', year:'2-digit'});
+  });
+  const label = currentMetric === 'port' ? 'Port Go Live' : 'Proyek Go Live';
+  charts.trend = new Chart(document.getElementById('chartTrend'), {
+    type:'line',
+    data:{ labels, datasets:[{ label, data: sortedKeys.map(k=>val(monthAgg[k])),
+      borderColor:'#2F5233', backgroundColor:'rgba(47,82,51,0.10)', fill:true, tension:.35, pointRadius:3, pointBackgroundColor:'#2F5233' }]},
+    options:{ ...baseChartOptions(), plugins:{legend:{display:false}} }
+  });
+}
+
+function renderTrendDailyChart(dayAgg, curYear, curMonth){
+  if(charts.trendDaily) charts.trendDaily.destroy();
+  const daysInMonth = new Date(curYear, curMonth+1, 0).getDate();
+  const labels = [];
+  const data = [];
+  for(let d=1; d<=daysInMonth; d++){
+    labels.push(d);
+    data.push(dayAgg[d] ? val(dayAgg[d]) : 0);
+  }
+  const monthName = new Date(curYear, curMonth).toLocaleDateString('id-ID', {month:'long', year:'numeric'});
+  const descEl = document.getElementById('dailyTrendDesc');
+  if(descEl) descEl.textContent = `Sumber: kolom TANGGAL GOLIVE · Progres harian bulan ${monthName} · Tidak ikut pada gambar unduhan laporan.`;
+  const label = currentMetric === 'port' ? 'Port Go Live' : 'Proyek Go Live';
+  charts.trendDaily = new Chart(document.getElementById('chartTrendDaily'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label, data, backgroundColor:'#3B6E86', borderRadius:4, maxBarThickness:22 }]},
+    options:{ ...baseChartOptions(), plugins:{legend:{display:false}} }
+  });
+}
+
+
+function setupFilters(){
+  const statusSet = new Set(), jenisSet = new Set(), branchSet = new Set();
+  rows.forEach(r=>{
+    statusSet.add(deriveStatus(get(r,'STAT FINAL')));
+    if(get(r,'JENIS PROGRAM CEK')) jenisSet.add(get(r,'JENIS PROGRAM CEK'));
+    if(get(r,'Telkomsel Branch')) branchSet.add(get(r,'Telkomsel Branch'));
+  });
+  fillSelect('filterStatus', statusSet, 'Semua Status');
+  fillSelect('filterJenis', jenisSet, 'Semua Jenis Program');
+  fillSelect('filterBranch', branchSet, 'Semua District');
+
+  document.getElementById('searchInput').oninput = ()=>{ currentPage=1; renderTable(); };
+  document.getElementById('filterStatus').onchange = ()=>{ currentPage=1; renderTable(); };
+  document.getElementById('filterJenis').onchange = ()=>{ currentPage=1; renderTable(); };
+  document.getElementById('filterBranch').onchange = ()=>{ currentPage=1; renderTable(); };
+}
+function fillSelect(id, set, defaultLabel){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const current = el.value;
+  el.innerHTML = `<option value="">${defaultLabel}</option>` +
+    [...set].sort().map(v=>`<option value="${v.replace(/"/g,'&quot;')}">${v}</option>`).join('');
+  el.value = current;
+}
+
+function getFilteredRows(){
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const fStatus = document.getElementById('filterStatus').value;
+  const fJenis = document.getElementById('filterJenis').value;
+  const fBranch = document.getElementById('filterBranch').value;
+  return rows.filter(r=>{
+    if(fStatus && deriveStatus(get(r,'STAT FINAL')) !== fStatus) return false;
+    if(fJenis && get(r,'JENIS PROGRAM CEK') !== fJenis) return false;
+    if(fBranch && get(r,'Telkomsel Branch') !== fBranch) return false;
+    if(search){
+      const hay = (get(r,'Nama Proyek') + ' ' + get(r,'iHLD LoP ID')).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function renderTable(){
+  const filtered = getFilteredRows();
+  document.getElementById('resultCount').textContent = filtered.length.toLocaleString('id-ID') + ' proyek';
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if(currentPage > totalPages) currentPage = totalPages;
+  const pageRows = filtered.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+
+  document.getElementById('tableBody').innerHTML = pageRows.map(r=>{
+    const ket = get(r,'KET DROP') || get(r,'DETIL KETERANGAN') || '—';
+    return `<tr>
+      <td class="name">${get(r,'Nama Proyek')||'—'}</td>
+      <td>${get(r,'Telkomsel Branch')||'—'}</td>
+      <td>${get(r,'JENIS PROGRAM CEK')||'—'}</td>
+      <td>${badgeHTML(deriveStatus(get(r,'STAT FINAL')))}</td>
+      <td>${get(r,'STAT FINAL')||'—'}</td>
+      <td>${get(r,'PORT ACTUAL')||'—'}</td>
+      <td>${get(r,'TGL GOLIVE')||'—'}</td>
+      <td>${ket}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:30px;">Tidak ada proyek yang cocok dengan filter.</td></tr>`;
+
+  document.getElementById('pageInfo').textContent = `Halaman ${currentPage} dari ${totalPages}`;
+  document.getElementById('prevPage').disabled = currentPage <= 1;
+  document.getElementById('nextPage').disabled = currentPage >= totalPages;
+}
+
+document.getElementById('prevPage').onclick = ()=>{ if(currentPage>1){ currentPage--; renderTable(); } };
+document.getElementById('nextPage').onclick = ()=>{ currentPage++; renderTable(); };
+document.getElementById('lanjutGoPrevPage').onclick = ()=>{ if(lanjutGoPage>1){ lanjutGoPage--; renderLanjutGoTable(); } };
+document.getElementById('lanjutGoNextPage').onclick = ()=>{ lanjutGoPage++; renderLanjutGoTable(); };
+document.getElementById('refreshBtn').onclick = loadData;
+
+async function downloadReportImage(){
+  const btn = document.getElementById('downloadBtn');
+  const capture = document.getElementById('reportCapture');
+  const dateEl = document.getElementById('reportHeaderDate');
+  if(!capture) return;
+
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'MENYIAPKAN GAMBAR...';
+
+  const now = new Date();
+  dateEl.textContent = 'Update per ' + now.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + ', ' + now.toLocaleTimeString('id-ID');
+  capture.classList.add('capturing');
+
+  try{
+    // beri waktu browser render header sebelum di-capture
+    await new Promise(r=>setTimeout(r, 80));
+    const canvas = await html2canvas(capture, {
+      backgroundColor: '#F4F6FB',
+      scale: 2,
+      useCORS: true,
+    });
+    const link = document.createElement('a');
+    const fileDate = now.toISOString().slice(0,10);
+    link.download = `laporan-pt2-sbu-${fileDate}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    // Sertakan juga data Lanjut (GO) dalam bentuk Excel
+    if(AGG && AGG.lanjutGoRows && AGG.lanjutGoRows.length > 0){
+      await new Promise(r=>setTimeout(r, 400)); // jeda biar browser tidak blokir download beruntun
+      downloadLanjutGoExcel();
+    }
+  }catch(err){
+    alert('Gagal membuat gambar: ' + err.message);
+  }finally{
+    capture.classList.remove('capturing');
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+document.getElementById('downloadBtn').onclick = downloadReportImage;
+
+// --- Upload CSV manual ---
+const csvFileInput = document.getElementById('csvFileInput');
+const uploadBox = document.getElementById('uploadBox');
+
+document.getElementById('uploadBtnTrigger').onclick = ()=> csvFileInput.click();
+document.getElementById('uploadBtnHeader').onclick = ()=> csvFileInput.click();
+csvFileInput.onchange = (e)=>{ if(e.target.files[0]) handleCSVFile(e.target.files[0]); };
+
+uploadBox.addEventListener('dragover', (e)=>{ e.preventDefault(); uploadBox.classList.add('dragover'); });
+uploadBox.addEventListener('dragleave', ()=> uploadBox.classList.remove('dragover'));
+uploadBox.addEventListener('drop', (e)=>{
+  e.preventDefault();
+  uploadBox.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) handleCSVFile(file);
+});
+
+// --- Upload CSV GL OCC 26 harian per branch ---
+const glOccDailyFileInput = document.getElementById('glOccDailyFileInput');
+const uploadBoxGlOccDaily = document.getElementById('uploadBoxGlOccDaily');
+
+document.getElementById('glOccDailyUploadTrigger').onclick = ()=> glOccDailyFileInput.click();
+glOccDailyFileInput.onchange = (e)=>{ if(e.target.files[0]) handleGLOccDailyFile(e.target.files[0]); };
+
+uploadBoxGlOccDaily.addEventListener('dragover', (e)=>{ e.preventDefault(); uploadBoxGlOccDaily.classList.add('dragover'); });
+uploadBoxGlOccDaily.addEventListener('dragleave', ()=> uploadBoxGlOccDaily.classList.remove('dragover'));
+uploadBoxGlOccDaily.addEventListener('drop', (e)=>{
+  e.preventDefault();
+  uploadBoxGlOccDaily.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) handleGLOccDailyFile(file);
+});
+
+loadData();
+</script>
+</body>
+</html>
