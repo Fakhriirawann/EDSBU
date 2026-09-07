@@ -175,8 +175,6 @@
   .multiselect-panel label:hover{background:#F3F4F6;}
   .multiselect-panel .msel-all{border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:8px;font-weight:600;}
   .multiselect-panel input[type="checkbox"]{width:15px;height:15px;flex-shrink:0;}
-  .donut-detail-fade{transition:opacity .28s ease, transform .28s ease;opacity:0;transform:translateY(6px);}
-  .donut-detail-fade.show{opacity:1;transform:translateY(0);}
   .active-filter-badge{
     display:flex;align-items:center;gap:10px;background:#EFF6FF;border:1px solid #BFDBFE;
     border-radius:8px;padding:9px 14px;margin-bottom:14px;font-size:13px;color:#1E3A8A;
@@ -364,7 +362,6 @@
     <button class="page-tab" id="tabBtnLapPt2" type="button">PT2</button>
     <button class="page-tab" id="tabBtnKomitmenGL" type="button">🎯 Komitmen GL</button>
     <button class="page-tab" id="tabBtnChecklist" type="button">☑️ Checklist</button>
-    <button class="page-tab" id="tabBtnNeedOlt" type="button">🔧 Need Modul OLT</button>
   </div>
 
   <div id="pagePT2">
@@ -712,6 +709,20 @@
       </div>
 
       <div class="section">
+        <p class="section-title">Breakdown OGP</p>
+        <p class="section-desc">Sebaran status/tahap untuk order yang masih OGP (belum Golive/Drop). Klik salah satu bagian donut buat lihat detail order-nya.</p>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1.2fr;">
+          <div class="table-card" style="padding:16px;">
+            <div style="height:280px;"><canvas id="hemOgpStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="kpi-sub" id="hemOgpStatusDonutDetailEmpty">Klik salah satu bagian donut buat lihat detail order-nya di sini.</p>
+            <div id="hemOgpStatusDonutDetailContent" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
 
         <div id="hemKomitmenCaptureArea" style="background:#fff;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
@@ -756,14 +767,6 @@
         </div>
       </div>
 
-      <div class="section" style="max-width:520px;">
-        <p class="section-title">Breakdown OGP</p>
-        <p class="section-desc">Sebaran status/tahap untuk order yang masih OGP (belum Golive/Drop). Klik salah satu bagian donut buat filter Daftar Work Order di bawah.</p>
-        <div class="table-card" style="padding:16px;">
-          <div style="height:280px;"><canvas id="hemOgpStatusDonut"></canvas></div>
-        </div>
-      </div>
-
       <div class="section" id="hemWorkOrderSection">
         <p class="section-title">Daftar Work Order</p>
         <p class="section-desc">Cari dan filter untuk melihat detail tiap order. Kolom "Catatan" bisa langsung diedit — otomatis tersimpan ke kolom W di Google Sheets.</p>
@@ -783,7 +786,6 @@
             <div class="multiselect-panel" id="hemFilterProgressPanel" style="display:none;"></div>
           </div>
           <span class="count" id="hemResultCount"></span>
-          <button type="button" class="download-btn" id="hemDownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -899,6 +901,20 @@
       </div>
 
       <div class="section">
+        <p class="section-title">Breakdown OGP</p>
+        <p class="section-desc">Sebaran status/tahap untuk order yang masih OGP (belum Golive/Drop). Klik salah satu bagian donut buat lihat detail order-nya.</p>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1.2fr;">
+          <div class="table-card" style="padding:16px;">
+            <div style="height:280px;"><canvas id="oloOgpStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="kpi-sub" id="oloOgpStatusDonutDetailEmpty">Klik salah satu bagian donut buat lihat detail order-nya di sini.</p>
+            <div id="oloOgpStatusDonutDetailContent" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
         <p class="section-title">Prioritas</p>
         <p class="section-desc">Jumlah order per level prioritas (kolom PRIORITAS). Klik baris buat lihat detail order-nya.</p>
         <div class="table-card">
@@ -950,14 +966,6 @@
         </div>
       </div>
 
-      <div class="section" style="max-width:520px;">
-        <p class="section-title">Breakdown OGP</p>
-        <p class="section-desc">Sebaran status/tahap untuk order yang masih OGP (belum Golive/Drop). Klik salah satu bagian donut buat filter Daftar Work Order di bawah.</p>
-        <div class="table-card" style="padding:16px;">
-          <div style="height:280px;"><canvas id="oloOgpStatusDonut"></canvas></div>
-        </div>
-      </div>
-
       <div class="section" id="oloWorkOrderSection">
         <p class="section-title">Daftar Work Order OLO</p>
         <p class="section-desc">Cari dan filter untuk melihat detail tiap order.</p>
@@ -976,12 +984,7 @@
             <button type="button" class="multiselect-btn" id="oloFilterProgressBtn">Semua Progres <span class="chev">▾</span></button>
             <div class="multiselect-panel" id="oloFilterProgressPanel" style="display:none;"></div>
           </div>
-          <div class="multiselect" id="oloFilterSubStatusWrap">
-            <button type="button" class="multiselect-btn" id="oloFilterSubStatusBtn">Semua Sub Status <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="oloFilterSubStatusPanel" style="display:none;"></div>
-          </div>
           <span class="count" id="oloResultCount"></span>
-          <button type="button" class="download-btn" id="oloDownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -1091,6 +1094,30 @@
         </div>
       </div>
 
+      <div class="section">
+        <p class="section-title">Breakdown OGP</p>
+        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI). Klik salah satu bagian donut buat lihat detail order-nya.</p>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1.2fr;">
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
+            <div style="height:280px;"><canvas id="mbbOgpStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="kpi-sub" id="mbbOgpStatusDonutDetailEmpty">Klik salah satu bagian donut buat lihat detail order-nya di sini.</p>
+            <div id="mbbOgpStatusDonutDetailContent" style="display:none;"></div>
+          </div>
+        </div>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1.2fr;margin-top:16px;">
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
+            <div style="height:280px;"><canvas id="mbbOgpSubStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="kpi-sub" id="mbbOgpSubStatusDonutDetailEmpty">Klik salah satu bagian donut buat lihat detail order-nya di sini.</p>
+            <div id="mbbOgpSubStatusDonutDetailContent" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
 
       <div class="section">
 
@@ -1139,21 +1166,6 @@
       </div>
       </div>
 
-      <div class="section">
-        <p class="section-title">Breakdown OGP</p>
-        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI). Klik salah satu bagian donut buat filter Daftar Work Order di bawah.</p>
-        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1fr;">
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
-            <div style="height:280px;"><canvas id="mbbOgpStatusDonut"></canvas></div>
-          </div>
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
-            <div style="height:280px;"><canvas id="mbbOgpSubStatusDonut"></canvas></div>
-          </div>
-        </div>
-      </div>
-
       <div class="section" id="mbbWorkOrderSection">
         <p class="section-title">Daftar Work Order MBB</p>
         <p class="section-desc">Semua order MBB, bisa dicari &amp; difilter.</p>
@@ -1168,12 +1180,7 @@
             <button type="button" class="multiselect-btn" id="mbbFilterStatusBtn">Semua Status <span class="chev">▾</span></button>
             <div class="multiselect-panel" id="mbbFilterStatusPanel" style="display:none;"></div>
           </div>
-          <div class="multiselect" id="mbbFilterSubStatusWrap">
-            <button type="button" class="multiselect-btn" id="mbbFilterSubStatusBtn">Semua Sub Status <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="mbbFilterSubStatusPanel" style="display:none;"></div>
-          </div>
           <span class="count" id="mbbResultCount"></span>
-          <button type="button" class="download-btn" id="mbbDownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -1291,6 +1298,21 @@
       </div>
 
       <div class="section">
+        <p class="section-title">Breakdown OGP</p>
+        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI).</p>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1fr;">
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
+            <div style="height:280px;"><canvas id="pt3OgpStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
+            <div style="height:280px;"><canvas id="pt3OgpSubStatusDonut"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
 
         <div id="pt3KomitmenCaptureArea" style="background:#fff;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
@@ -1330,21 +1352,6 @@
         <div id="pt3ReportCaptureArea"></div>
       </div>
 
-      <div class="section">
-        <p class="section-title">Breakdown OGP</p>
-        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI). Klik salah satu bagian donut buat filter Daftar Work Order di bawah.</p>
-        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1fr;">
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
-            <div style="height:280px;"><canvas id="pt3OgpStatusDonut"></canvas></div>
-          </div>
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
-            <div style="height:280px;"><canvas id="pt3OgpSubStatusDonut"></canvas></div>
-          </div>
-        </div>
-      </div>
-
       <div class="section" id="pt3WorkOrderSection">
         <p class="section-title">Daftar Work Order PT3 TA</p>
         <p class="section-desc">Semua order PT3, bisa dicari &amp; difilter.</p>
@@ -1359,12 +1366,7 @@
             <button type="button" class="multiselect-btn" id="pt3FilterStatusBtn">Semua Status <span class="chev">▾</span></button>
             <div class="multiselect-panel" id="pt3FilterStatusPanel" style="display:none;"></div>
           </div>
-          <div class="multiselect" id="pt3FilterSubStatusWrap">
-            <button type="button" class="multiselect-btn" id="pt3FilterSubStatusBtn">Semua Sub Status <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="pt3FilterSubStatusPanel" style="display:none;"></div>
-          </div>
           <span class="count" id="pt3ResultCount"></span>
-          <button type="button" class="download-btn" id="pt3DownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -1469,6 +1471,21 @@
       </div>
 
       <div class="section">
+        <p class="section-title">Breakdown OGP</p>
+        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI).</p>
+        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1fr;">
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
+            <div style="height:280px;"><canvas id="pt3fhOgpStatusDonut"></canvas></div>
+          </div>
+          <div class="table-card" style="padding:16px;">
+            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
+            <div style="height:280px;"><canvas id="pt3fhOgpSubStatusDonut"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
 
         <div id="pt3fhKomitmenCaptureArea" style="background:#fff;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
@@ -1508,21 +1525,6 @@
         <div id="pt3fhReportCaptureArea"></div>
       </div>
 
-      <div class="section">
-        <p class="section-title">Breakdown OGP</p>
-        <p class="section-desc">Sebaran status/tahap dan sub-status untuk order yang masih OGP (belum Golive/Drop/FI). Klik salah satu bagian donut buat filter Daftar Work Order di bawah.</p>
-        <div class="mbb-report-subgrid" style="grid-template-columns:1fr 1fr;">
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Status</p>
-            <div style="height:280px;"><canvas id="pt3fhOgpStatusDonut"></canvas></div>
-          </div>
-          <div class="table-card" style="padding:16px;">
-            <p class="section-title" style="font-size:13px;margin-bottom:8px;text-align:center;">Berdasarkan Sub Status</p>
-            <div style="height:280px;"><canvas id="pt3fhOgpSubStatusDonut"></canvas></div>
-          </div>
-        </div>
-      </div>
-
       <div class="section" id="pt3fhWorkOrderSection">
         <p class="section-title">Daftar Work Order PT3 FH</p>
         <p class="section-desc">Semua order PT3 FH, bisa dicari &amp; difilter.</p>
@@ -1537,12 +1539,7 @@
             <button type="button" class="multiselect-btn" id="pt3fhFilterStatusBtn">Semua Status <span class="chev">▾</span></button>
             <div class="multiselect-panel" id="pt3fhFilterStatusPanel" style="display:none;"></div>
           </div>
-          <div class="multiselect" id="pt3fhFilterSubStatusWrap">
-            <button type="button" class="multiselect-btn" id="pt3fhFilterSubStatusBtn">Semua Sub Status <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="pt3fhFilterSubStatusPanel" style="display:none;"></div>
-          </div>
           <span class="count" id="pt3fhResultCount"></span>
-          <button type="button" class="download-btn" id="pt3fhDownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -1666,7 +1663,6 @@
           <select id="qeRelokFilterDistrict"><option value="">Semua District</option></select>
           <select id="qeRelokFilterStatus"><option value="">Semua Status</option></select>
           <span class="count" id="qeRelokResultCount"></span>
-          <button type="button" class="download-btn" id="qeRelokDownloadBtn" style="margin-top:0;margin-left:auto;">📥 Download CSV</button>
         </div>
         <div class="table-card">
           <table>
@@ -1997,170 +1993,12 @@
 
     </div>
 
-    <div id="pageNeedOlt" style="display:none;">
-
-    <div id="needOltCaptureArea">
-      <div class="section" style="margin-top:0;">
-        <p class="section-title" style="margin-bottom:2px;">Need Modul OLT</p>
-        <p class="section-desc" style="margin:0;">Order yang kendala butuh modul OLT, digabung dari PT3 TA dan MBB.</p>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <p class="section-title" style="margin:0;">PT3 TA <span class="kpi-sub" id="pt3NeedOltCount" style="font-weight:500;"></span></p>
-          <button type="button" class="download-btn capture-hide" id="pt3NeedOltDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <p class="section-desc">Sub Status Kons = "6.4 Kendala - Modul OLT"</p>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Branch</th><th>STO</th><th>Nama LOP</th><th>Mitra</th>
-                <th>Tgl Order</th><th>Status</th><th>Port Plan</th><th>Komitmen Golive</th><th>Sub Status</th>
-              </tr>
-            </thead>
-            <tbody id="pt3NeedOltTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <p class="section-title" style="margin:0;">MBB <span class="kpi-sub" id="mbbNeedOltCount" style="font-weight:500;"></span></p>
-          <button type="button" class="download-btn capture-hide" id="mbbNeedOltDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <p class="section-desc">Sub Status = "1.10 OLT penuh need confirm ED"</p>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Branch</th><th>STO</th><th>Site Name</th><th>Mitra</th>
-                <th>Tgl WO</th><th>Status</th><th>TGL Commit OA Fix</th><th>Sub Status</th>
-              </tr>
-            </thead>
-            <tbody id="mbbNeedOltTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <p class="section-title" style="margin:0;">OLO <span class="kpi-sub" id="oloNeedOltCount" style="font-weight:500;"></span></p>
-          <button type="button" class="download-btn capture-hide" id="oloNeedOltDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <p class="section-desc">Sub Status = "MODUL OLT FULL"</p>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>IHLD</th><th>No Order</th><th>Nama Proyek</th><th>District</th><th>STO</th>
-                <th>Tanggal Order</th><th>Progres Lapangan</th><th>New Komitmen GL</th><th>Sub Status</th>
-              </tr>
-            </thead>
-            <tbody id="oloNeedOltTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="section">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <p class="section-title" style="margin:0;">Mini OLT (Laporan Usulan) <span class="kpi-sub" id="miniOltNeedOltCount" style="font-weight:500;"></span></p>
-          <button type="button" class="download-btn capture-hide" id="miniOltNeedOltDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <p class="section-desc">Branch: Banda Aceh, Binjai, Medan, Rantau Prapat, Padang Sidempuan, Pematang Siantar</p>
-        <div class="filters">
-          <input type="text" id="miniOltSearchInput" placeholder="Cari ID IHLD, Cluster...">
-          <div class="multiselect" id="miniOltFilterBranchWrap">
-            <button type="button" class="multiselect-btn" id="miniOltFilterBranchBtn">Semua Branch <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="miniOltFilterBranchPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="miniOltFilterJenisOrderWrap">
-            <button type="button" class="multiselect-btn" id="miniOltFilterJenisOrderBtn">Semua Jenis Order <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="miniOltFilterJenisOrderPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="miniOltFilterStatusOspWrap">
-            <button type="button" class="multiselect-btn" id="miniOltFilterStatusOspBtn">Semua Status OSP <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="miniOltFilterStatusOspPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="miniOltFilterPrioritasWrap">
-            <button type="button" class="multiselect-btn" id="miniOltFilterPrioritasBtn">Semua Prioritas <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="miniOltFilterPrioritasPanel" style="display:none;"></div>
-          </div>
-        </div>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>Branch</th><th>STO</th><th>Tahun</th><th>Jenis Order</th><th>ID IHLD</th><th>Cluster</th>
-                <th>Port Plan</th><th>Kebutuhan Mini OLT</th><th>Site ID/Location</th><th>Tgl Input Gdoc</th>
-                <th>Remark</th><th>Status OSP</th><th>Prioritas</th><th>Plan FI/GL OSP</th>
-              </tr>
-            </thead>
-            <tbody id="miniOltNeedOltTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    </div>
-
 
     
 
 </div>
 
 <script>
-/**
- * Universal fetch — kalau dashboard ini dihost via Google Apps Script
- * (Web App), browser DIBLOKIR fetch langsung ke domain lain (docs.google.com)
- * karena aturan sandbox bawaan Apps Script. Jadi kalau kedeteksi lagi jalan
- * di Apps Script, request-nya dilempar ke SERVER dulu (lewat google.script.run
- * yang manggil UrlFetchApp di Code.gs — itu nggak kena blokir), baru hasilnya
- * dibungkus ulang supaya perilakunya sama kayak fetch() biasa (.ok, .text()).
- * Kalau bukan di Apps Script (dibuka sebagai file HTML biasa), langsung
- * pakai fetch() normal seperti biasa — nggak ada bedanya sama sekali.
- */
-function isGasEnv(){
-  return typeof google !== 'undefined' && !!google.script && typeof google.script.run !== 'undefined';
-}
-function gasFetchUrl(url){
-  return new Promise((resolve)=>{
-    google.script.run
-      .withSuccessHandler((result)=> resolve(result))
-      .withFailureHandler((err)=> resolve({ ok:false, status:0, text:'', error:String(err) }))
-      .serverFetchUrl(url);
-  });
-}
-async function universalFetch(url, opts){
-  if(isGasEnv()){
-    const result = await gasFetchUrl(url);
-    return { ok: !!result.ok, status: result.status || 0, text: async ()=> result.text || '' };
-  }
-  return fetch(url, opts);
-}
-
-/**
- * Download array of rows (hasil filter, SEMUA halaman — bukan cuma yang
- * lagi ke-render karena pagination) jadi file CSV. `columns` = array of
- * {label, get(row)}.
- */
-function downloadRowsAsCsv(filename, columns, rows){
-  const escapeCsv = (val)=>{
-    val = (val===null||val===undefined) ? '' : String(val).trim();
-    if(/[",\n]/.test(val)) return '"' + val.replace(/"/g,'""') + '"';
-    return val;
-  };
-  const header = columns.map(c=>escapeCsv(c.label)).join(',');
-  const lines = rows.map(row=> columns.map(c=>escapeCsv(c.get(row))).join(','));
-  const csv = [header, ...lines].join('\r\n');
-  const blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8;'}); // BOM biar Excel baca UTF-8 dgn benar
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = filename;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
 const CSV_URLS = [
   "https://docs.google.com/spreadsheets/d/1azzVodMtgOyw0cmS3FLkkzC7ZEU_aO7ekyn_NKEUkZU/gviz/tq?tqx=out:csv&gid=1563055842",
   "https://docs.google.com/spreadsheets/d/1azzVodMtgOyw0cmS3FLkkzC7ZEU_aO7ekyn_NKEUkZU/export?format=csv&gid=1563055842",
@@ -2193,7 +2031,7 @@ async function loadResumeeSbuOdcAuto(){
   let text = null;
   for(const url of RESUMEE_SBU_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok) continue;
       const t = await res.text();
       if(t && t.trim().length > 0 && !t.trim().startsWith('<')){ text = t; break; }
@@ -2358,7 +2196,7 @@ async function loadData(){
   let lastErr = null;
   for(const url of CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const t = await res.text();
       if(t && t.trim().length > 0 && !t.trim().startsWith('<')){
@@ -2544,7 +2382,7 @@ async function loadGolongOccAuto(){
   let lastErr = null;
   for(const url of GOLONG_OCC_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -3651,7 +3489,7 @@ async function fetchSheetLastUpdate(docId){
   ];
   for(const url of urls){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok) continue;
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')) continue;
@@ -3781,7 +3619,7 @@ async function hemLoadDataAuto(){
   let lastErr = null;
   for(const url of HEM_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -3914,7 +3752,7 @@ function hemBuildDashboard(){
   hemRenderKPIs();
   hemRenderProgressChart();
   hemRenderPivotDistrict();
-  renderOgpBreakdownDonut('hemOgpStatusDonut', hemAGG.rows.filter(r=>hemCategoryOfLabel(hemRowProgressLabel(r))==='ogp'), (r)=> hemStripStatusPrefix(hemRowProgressLabel(r)).toUpperCase(), 8, hemFilterCtl, (r)=> hemStripStatusPrefix(hemRowProgressLabel(r)).toUpperCase(), 'Status');
+  renderOgpBreakdownDonut('hemOgpStatusDonut', hemAGG.rows.filter(r=>hemCategoryOfLabel(hemRowProgressLabel(r))==='ogp'), (r)=> hemStripStatusPrefix(hemRowProgressLabel(r)).toUpperCase(), 8, 'hemOgpStatusDonut', (r)=>({ id: hemGet(r,'IHLD'), nama: hemGet(r,'NAMA LOP'), sub: hemGet(r,'WITEL') + ' — ' + hemGet(r,'DISTRICT') }));
   hemRenderSlaChart();
   hemRenderDistrictChart();
   hemSetupFilters();
@@ -4192,12 +4030,10 @@ function makeAdvancedFilterController(sectionId, badgeId, renderTableFn, resetPa
  * Donut chart generik: breakdown baris OGP berdasarkan suatu label
  * (status/tahap atau sub-status). Dipakai bareng di HEM/OLO/MBB/PT3 TA/PT3 FH.
  * Otomatis gabung kategori kecil jadi "Lainnya" kalau kategorinya kebanyakan.
- * Klik salah satu potongan -> filter tabel Daftar Work Order (lewat filterCtl),
- * bukan nampilin panel detail terpisah.
  */
 const _ogpBreakdownCharts = {};
 const OGP_DONUT_PALETTE = ['#2E4374','#3FA7B0','#B5305A','#D9A441','#5B8C51','#8858B0','#C97A3E','#4A6C8C','#A34E6B'];
-function renderOgpBreakdownDonut(canvasId, ogpRows, labelFn, maxSlices, filterCtl, predicateFieldFn, chartLabel){
+function renderOgpBreakdownDonut(canvasId, ogpRows, labelFn, maxSlices, detailPrefix, rowDisplayFn){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
   maxSlices = maxSlices || 8;
@@ -4218,63 +4054,39 @@ function renderOgpBreakdownDonut(canvasId, ogpRows, labelFn, maxSlices, filterCt
   }
   const labels = entries.map(e=>e[0]);
   const data = entries.map(e=>e[1]);
-  const grandTotal = data.reduce((s,v)=>s+v, 0);
   const colors = labels.map((_,i)=> i===labels.length-1 && labels[i]==='Lainnya' ? '#9CA3AF' : OGP_DONUT_PALETTE[i % OGP_DONUT_PALETTE.length]);
-  const baseOffsets = labels.map(()=> 0);
 
   if(_ogpBreakdownCharts[canvasId]) _ogpBreakdownCharts[canvasId].destroy();
 
   if(data.length === 0){
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(detailPrefix) showOgpDonutDetailEmpty(detailPrefix);
     return;
   }
 
-  let selectedIdx = null;
   _ogpBreakdownCharts[canvasId] = new Chart(canvas, {
     type:'doughnut',
-    data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#FFFFFF', borderWidth:2, offset:baseOffsets.slice() }] },
+    data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#FFFFFF', borderWidth:2 }] },
     options:{
       responsive:true, maintainAspectRatio:false, cutout:'60%',
-      animation:{ duration:600, easing:'easeOutQuart' },
-      transitions:{ active:{ animation:{ duration:400, easing:'easeOutQuart' } } },
-      onClick: filterCtl ? (evt, elements)=>{
+      onClick: detailPrefix ? (evt, elements)=>{
         if(!elements.length) return;
         const idx = elements[0].index;
-        const chart = _ogpBreakdownCharts[canvasId];
-
-        // Efek "pop-out" — slice yang diklik nongol keluar sedikit, kayak Looker Studio
-        selectedIdx = (selectedIdx === idx) ? null : idx;
-        chart.data.datasets[0].offset = labels.map((_,i)=> i === selectedIdx ? 22 : 0);
-        chart.update();
-
-        if(selectedIdx === null){
-          filterCtl.clear();
-          return;
-        }
         const clickedLabel = labels[idx];
-        let matchSet;
+        let matchRows;
         if(clickedLabel === 'Lainnya' && othersLabels.length){
-          matchSet = new Set(othersLabels);
-          filterCtl.set((row)=> matchSet.has(predicateFieldFn(row) || 'Tidak Diketahui'), `${chartLabel}: Lainnya`);
+          matchRows = ogpRows.filter(r => othersLabels.includes(labelFn(r) || 'Tidak Diketahui'));
         }else{
-          filterCtl.set((row)=> (predicateFieldFn(row) || 'Tidak Diketahui') === clickedLabel, `${chartLabel}: ${clickedLabel}`);
+          matchRows = ogpRows.filter(r => (labelFn(r) || 'Tidak Diketahui') === clickedLabel);
         }
+        showOgpDonutDetail(detailPrefix, clickedLabel, matchRows, rowDisplayFn);
       } : undefined,
-      onHover: filterCtl ? (evt, elements)=>{
+      onHover: detailPrefix ? (evt, elements)=>{
         evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
       } : undefined,
       plugins:{
         legend:{ position:'bottom', labels:{ color:'#5B6478', font:{family:'Inter', size:10.5}, padding:9, boxWidth:11 } },
-        tooltip:{
-          callbacks:{
-            label:(ctx)=>{
-              const val = ctx.parsed;
-              const pct = grandTotal ? (val/grandTotal*100).toFixed(1) : '0.0';
-              return ` ${ctx.label}: ${val.toLocaleString('id-ID')} (${pct}%)`;
-            }
-          }
-        },
         datalabels:{
           display:(ctx)=>ctx.dataset.data[ctx.dataIndex] > 0,
           color:'#fff', font:{family:"'JetBrains Mono', monospace", size:10, weight:'600'},
@@ -4282,6 +4094,36 @@ function renderOgpBreakdownDonut(canvasId, ogpRows, labelFn, maxSlices, filterCt
       }
     }
   });
+}
+
+/* Tampilkan daftar order buat 1 potongan donut yang diklik, di kartu
+   sebelah kanannya (yang tadinya kosong). */
+function showOgpDonutDetail(prefix, label, rows, rowDisplayFn){
+  const emptyEl = document.getElementById(prefix + 'DetailEmpty');
+  const contentEl = document.getElementById(prefix + 'DetailContent');
+  if(!contentEl) return;
+  if(emptyEl) emptyEl.style.display = 'none';
+  contentEl.style.display = 'block';
+
+  const shown = rows.slice(0, 50);
+  contentEl.innerHTML = `
+    <p class="section-title" style="font-size:13px;margin:0 0 10px;">${label} <span style="color:var(--text-faint);font-weight:500;">(${rows.length.toLocaleString('id-ID')})</span></p>
+    <div style="max-height:230px;overflow-y:auto;">
+      ${shown.map(r=>{
+        const d = rowDisplayFn ? rowDisplayFn(r) : { id:'', nama:'', sub:'' };
+        return `<div style="padding:7px 0;border-bottom:1px solid var(--line);font-size:12.5px;">
+          <div style="font-weight:600;color:var(--text);">${d.id || '—'} — ${d.nama || '—'}</div>
+          <div style="color:var(--text-faint);margin-top:1px;">${d.sub || '—'}</div>
+        </div>`;
+      }).join('') || `<p class="kpi-sub">Tidak ada data.</p>`}
+      ${rows.length > 50 ? `<div style="padding:8px 0;color:var(--text-faint);font-size:11.5px;">...dan ${(rows.length-50).toLocaleString('id-ID')} lainnya</div>` : ''}
+    </div>`;
+}
+function showOgpDonutDetailEmpty(prefix){
+  const emptyEl = document.getElementById(prefix + 'DetailEmpty');
+  const contentEl = document.getElementById(prefix + 'DetailContent');
+  if(emptyEl) emptyEl.style.display = 'block';
+  if(contentEl){ contentEl.style.display = 'none'; contentEl.innerHTML = ''; }
 }
 
 const _komitmenTrendCharts = {};
@@ -4723,7 +4565,7 @@ async function hemSaveCatatan(ihld, text, inputEl){
   if(inputEl) inputEl.style.borderColor = 'var(--amber)'; // sedang nyimpan
   try{
     const url = HEM_WRITE_API_URL + '?action=updateCatatan&ihld=' + encodeURIComponent(ihld) + '&text=' + encodeURIComponent(text);
-    const res = await universalFetch(url, {cache:'no-store'});
+    const res = await fetch(url, {cache:'no-store'});
     const data = await res.json();
     if(inputEl) inputEl.style.borderColor = data.ok ? 'var(--emerald)' : 'var(--red)';
     if(data.ok){
@@ -4817,7 +4659,7 @@ async function oloLoadDataAuto(){
   let lastErr = null;
   for(const url of OLO_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -4917,7 +4759,7 @@ function oloBuildDashboard(){
   oloRenderKPIs();
   oloRenderProgressChart();
   oloRenderPivotDistrict();
-  renderOgpBreakdownDonut('oloOgpStatusDonut', oloAGG.rows.filter(r=>hemCategoryOfLabel(oloRowProgressLabel(r))==='ogp'), (r)=> hemStripStatusPrefix(oloRowProgressLabel(r)).toUpperCase(), 8, oloFilterCtl, (r)=> hemStripStatusPrefix(oloRowProgressLabel(r)).toUpperCase(), 'Status');
+  renderOgpBreakdownDonut('oloOgpStatusDonut', oloAGG.rows.filter(r=>hemCategoryOfLabel(oloRowProgressLabel(r))==='ogp'), (r)=> hemStripStatusPrefix(oloRowProgressLabel(r)).toUpperCase(), 8, 'oloOgpStatusDonut', (r)=>({ id: oloGet(r,'IHLD'), nama: oloGet(r,'NAMA PROYEK'), sub: oloGet(r,'DISTRICT') + ' — ' + oloGet(r,'STO') }));
   oloRenderPrioritasTable();
   oloRenderDistrictChart();
   oloSetupFilters();
@@ -4929,7 +4771,6 @@ function oloBuildDashboard(){
   renderKomitmenTrendChart('oloKomitmenTrendChart', null, oloAGG.rows, oloGet, 'NEW KOMITMEN GL', (row)=> hemCategoryOfLabel(oloRowProgressLabel(row)), oloFilterCtl, 'oloKomitmenTrendTitle');
   renderKomitmenGLPage();
   renderOloChecklistPage();
-  renderOloNeedOltPage();
 }
 
 let oloCommitMonth = new Date().getMonth();
@@ -5196,18 +5037,15 @@ function makeMultiSelect(prefix, allLabel, onChange){
 const oloWitelMultiSelect = makeMultiSelect('oloFilterWitel', 'Semua Witel', ()=>{ oloCurrentPage=1; oloRenderTable(); });
 const oloDistrictMultiSelect = makeMultiSelect('oloFilterDistrict', 'Semua District', ()=>{ oloCurrentPage=1; oloRenderTable(); });
 const oloProgressMultiSelect = makeMultiSelect('oloFilterProgress', 'Semua Progres', ()=>{ oloCurrentPage=1; oloRenderTable(); });
-const oloSubStatusMultiSelect = makeMultiSelect('oloFilterSubStatus', 'Semua Sub Status', ()=>{ oloCurrentPage=1; oloRenderTable(); });
 
 function oloSetupFilters(){
   const witels = [...new Set(oloRows.map(r=>oloGet(r,'WITEL')).filter(Boolean))].sort();
   const districts = [...new Set(oloRows.map(r=>oloGet(r,'DISTRICT')).filter(Boolean))].sort();
   const progresses = [...new Set(oloRows.map(r=>oloGet(r,'Progress Lapangan')).filter(Boolean))].sort();
-  const subStatuses = [...new Set(oloRows.map(r=>oloGet(r,'SUB STATUS')).filter(Boolean))].sort();
 
   if(oloWitelMultiSelect) oloWitelMultiSelect.setOptions(witels);
   if(oloDistrictMultiSelect) oloDistrictMultiSelect.setOptions(districts);
   if(oloProgressMultiSelect) oloProgressMultiSelect.setOptions(progresses);
-  if(oloSubStatusMultiSelect) oloSubStatusMultiSelect.setOptions(subStatuses);
 
   document.getElementById('oloSearchInput').oninput = ()=>{ oloCurrentPage=1; oloRenderTable(); };
 }
@@ -5217,14 +5055,12 @@ function oloGetFilteredRows(){
   const witelFilters = oloWitelMultiSelect ? oloWitelMultiSelect.getSelected() : [];
   const districtFilters = oloDistrictMultiSelect ? oloDistrictMultiSelect.getSelected() : [];
   const progressFilters = oloProgressMultiSelect ? oloProgressMultiSelect.getSelected() : [];
-  const subStatusFilters = oloSubStatusMultiSelect ? oloSubStatusMultiSelect.getSelected() : [];
 
   const baseRows = oloFilterCtl.apply(oloAGG && oloAGG.rows ? oloAGG.rows : oloRows);
   const filtered = baseRows.filter(row=>{
     if(witelFilters.length && !witelFilters.includes(oloGet(row,'WITEL'))) return false;
     if(districtFilters.length && !districtFilters.includes(oloGet(row,'DISTRICT'))) return false;
     if(progressFilters.length && !progressFilters.includes(oloGet(row,'Progress Lapangan'))) return false;
-    if(subStatusFilters.length && !subStatusFilters.includes(oloGet(row,'SUB STATUS'))) return false;
     if(q){
       const hay = [oloGet(row,'IHLD'), oloGet(row,'NAMA PROYEK'), oloGet(row,'STO'), oloGet(row,'DISTRICT')].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
@@ -5302,7 +5138,7 @@ document.getElementById('oloNextPage').onclick = ()=>{ oloCurrentPage++; oloRend
 
 /* ---------- Tab switching (3 tab) ---------- */
 function switchTab(active){
-  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'], needOlt:['tabBtnNeedOlt','pageNeedOlt'] };
+  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'] };
   Object.keys(tabs).forEach(key=>{
     const [btnId, pageId] = tabs[key];
     const isActive = key === active;
@@ -5320,7 +5156,6 @@ document.getElementById('tabBtnQeRelok').onclick = ()=> switchTab('qeRelok');
 document.getElementById('tabBtnLapPt2').onclick = ()=> switchTab('lapPt2');
 document.getElementById('tabBtnKomitmenGL').onclick = ()=> switchTab('komitmenGL');
 document.getElementById('tabBtnChecklist').onclick = ()=> switchTab('checklist');
-document.getElementById('tabBtnNeedOlt').onclick = ()=> switchTab('needOlt');
 
 const hemStageDetailCloseBtn = document.getElementById('hemStageDetailCloseBtn');
 if(hemStageDetailCloseBtn) hemStageDetailCloseBtn.onclick = hemHideStageDetail;
@@ -5454,7 +5289,7 @@ async function mbbLoadDataAuto(){
   let lastErr = null;
   for(const url of MBB_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -5550,8 +5385,8 @@ function mbbBuildDashboard(){
   mbbRenderPivotBranch();
   {
     const mbbOgpRows = mbbAGG.rows.filter(r=>mbbFiOaOgp(r)==='ogp');
-    renderOgpBreakdownDonut('mbbOgpStatusDonut', mbbOgpRows, (r)=> hemStripStatusPrefix(mbbRowStatusLabel(r)).toUpperCase(), 8, mbbFilterCtl, (r)=> hemStripStatusPrefix(mbbRowStatusLabel(r)).toUpperCase(), 'Status');
-    renderOgpBreakdownDonut('mbbOgpSubStatusDonut', mbbOgpRows, (r)=> mbbGet(r,'SUB STATUS') || 'Tidak Diketahui', 8, mbbFilterCtl, (r)=> mbbGet(r,'SUB STATUS') || 'Tidak Diketahui', 'Sub Status');
+    renderOgpBreakdownDonut('mbbOgpStatusDonut', mbbOgpRows, (r)=> hemStripStatusPrefix(mbbRowStatusLabel(r)).toUpperCase(), 8, 'mbbOgpStatusDonut', (r)=>({ id: mbbGet(r,'ID'), nama: mbbGet(r,'SITE NAME'), sub: mbbGet(r,'BRANCH') + ' — ' + mbbGet(r,'STO') }));
+    renderOgpBreakdownDonut('mbbOgpSubStatusDonut', mbbOgpRows, (r)=> mbbGet(r,'SUB STATUS') || 'Tidak Diketahui', 8, 'mbbOgpSubStatusDonut', (r)=>({ id: mbbGet(r,'ID'), nama: mbbGet(r,'SITE NAME'), sub: mbbGet(r,'BRANCH') + ' — ' + mbbGet(r,'STO') }));
   }
   mbbRenderPriorityChart();
   mbbRenderMitraChart();
@@ -5564,7 +5399,6 @@ function mbbBuildDashboard(){
   mbbHideStageDetail();
   renderKomitmenTrendChart('mbbKomitmenTrendChart', null, mbbAGG.rows, mbbGet, 'TGL COMMIT OA FIX', (row)=> mbbFiOaOgp(row), mbbFilterCtl, 'mbbKomitmenTrendTitle');
   renderKomitmenGLPage();
-  renderMbbNeedOltPage();
 }
 
 const MBB_CATEGORY_LABELS = { all:'All Order', drop:'Drop', onair:'On Air', ogp:'OGP' };
@@ -6188,16 +6022,13 @@ function mbbRenderInfraLinkReport(){
 
 const mbbBranchMultiSelect = makeMultiSelect('mbbFilterBranch', 'Semua Branch', ()=>{ mbbCurrentPage=1; mbbRenderTable(); });
 const mbbStatusMultiSelect = makeMultiSelect('mbbFilterStatus', 'Semua Status', ()=>{ mbbCurrentPage=1; mbbRenderTable(); });
-const mbbSubStatusMultiSelect = makeMultiSelect('mbbFilterSubStatus', 'Semua Sub Status', ()=>{ mbbCurrentPage=1; mbbRenderTable(); });
 
 function mbbSetupFilters(){
   const branches = [...new Set(mbbRows.map(r=>mbbGet(r,'BRANCH')).filter(Boolean))].sort();
   const statuses = [...new Set(mbbRows.map(r=>mbbGet(r,'STATUS')).filter(Boolean))].sort();
-  const subStatuses = [...new Set(mbbRows.map(r=>mbbGet(r,'SUB STATUS')).filter(Boolean))].sort();
 
   if(mbbBranchMultiSelect) mbbBranchMultiSelect.setOptions(branches);
   if(mbbStatusMultiSelect) mbbStatusMultiSelect.setOptions(statuses);
-  if(mbbSubStatusMultiSelect) mbbSubStatusMultiSelect.setOptions(subStatuses);
 
   document.getElementById('mbbSearchInput').oninput = ()=>{ mbbCurrentPage=1; mbbRenderTable(); };
 }
@@ -6206,13 +6037,11 @@ function mbbGetFilteredRows(){
   const q = document.getElementById('mbbSearchInput').value.trim().toLowerCase();
   const branchFilters = mbbBranchMultiSelect ? mbbBranchMultiSelect.getSelected() : [];
   const statusFilters = mbbStatusMultiSelect ? mbbStatusMultiSelect.getSelected() : [];
-  const subStatusFilters = mbbSubStatusMultiSelect ? mbbSubStatusMultiSelect.getSelected() : [];
 
   const baseRows = mbbFilterCtl.apply(mbbAGG && mbbAGG.rows ? mbbAGG.rows : mbbRows);
   const filtered = baseRows.filter(row=>{
     if(branchFilters.length && !branchFilters.includes(mbbGet(row,'BRANCH'))) return false;
     if(statusFilters.length && !statusFilters.includes(mbbGet(row,'STATUS'))) return false;
-    if(subStatusFilters.length && !subStatusFilters.includes(mbbGet(row,'SUB STATUS'))) return false;
     if(q){
       const hay = [mbbGet(row,'ID'), mbbGet(row,'SITE NAME'), mbbGet(row,'STO'), mbbGet(row,'BRANCH')].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
@@ -6391,7 +6220,7 @@ async function pt3LoadDataAuto(){
   let lastErr = null;
   for(const url of PT3_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -6483,8 +6312,8 @@ function pt3BuildDashboard(){
   pt3RenderPivotBranch();
   {
     const pt3OgpRows = pt3AGG.rows.filter(r=>pt3Category2(r)==='ogp');
-    renderOgpBreakdownDonut('pt3OgpStatusDonut', pt3OgpRows, (r)=> hemStripStatusPrefix(pt3RowStatusLabel(r)).toUpperCase(), 8, pt3FilterCtl, (r)=> hemStripStatusPrefix(pt3RowStatusLabel(r)).toUpperCase(), 'Status');
-    renderOgpBreakdownDonut('pt3OgpSubStatusDonut', pt3OgpRows, (r)=> pt3Get(r,'SUB STATUS KONS') || 'Tidak Diketahui', 8, pt3FilterCtl, (r)=> pt3Get(r,'SUB STATUS KONS') || 'Tidak Diketahui', 'Sub Status');
+    renderOgpBreakdownDonut('pt3OgpStatusDonut', pt3OgpRows, (r)=> hemStripStatusPrefix(pt3RowStatusLabel(r)).toUpperCase());
+    renderOgpBreakdownDonut('pt3OgpSubStatusDonut', pt3OgpRows, (r)=> pt3Get(r,'SUB STATUS KONS') || 'Tidak Diketahui');
   }
   pt3RenderAllOrderReport();
   pt3SetupCommitDropdown();
@@ -6495,7 +6324,6 @@ function pt3BuildDashboard(){
   pt3HideStageDetail();
   renderKomitmenTrendChart('pt3KomitmenTrendChart', null, pt3AGG.rows, pt3Get, 'KOMITMEN GOLIVE', (row)=> pt3Category(row), pt3FilterCtl, 'pt3KomitmenTrendTitle');
   renderKomitmenGLPage();
-  renderPt3NeedOltPage();
 }
 
 const PT3_CATEGORY_LABELS = { all:'All Order', drop:'Drop', golive:'Golive', ogp:'OGP' };
@@ -7120,16 +6948,13 @@ function pt3SetupCommitDropdown(){
 
 const pt3BranchMultiSelect = makeMultiSelect('pt3FilterBranch', 'Semua Branch', ()=>{ pt3CurrentPage=1; pt3RenderTable(); });
 const pt3StatusMultiSelect = makeMultiSelect('pt3FilterStatus', 'Semua Status', ()=>{ pt3CurrentPage=1; pt3RenderTable(); });
-const pt3SubStatusMultiSelect = makeMultiSelect('pt3FilterSubStatus', 'Semua Sub Status', ()=>{ pt3CurrentPage=1; pt3RenderTable(); });
 
 function pt3SetupFilters(){
   const branches = [...new Set(pt3Rows.map(r=>pt3Get(r,'BRANCH FMC')).filter(Boolean))].sort();
   const statuses = [...new Set(pt3Rows.map(r=>pt3Get(r,'Status')).filter(Boolean))].sort();
-  const subStatuses = [...new Set(pt3Rows.map(r=>pt3Get(r,'SUB STATUS KONS')).filter(Boolean))].sort();
 
   if(pt3BranchMultiSelect) pt3BranchMultiSelect.setOptions(branches);
   if(pt3StatusMultiSelect) pt3StatusMultiSelect.setOptions(statuses);
-  if(pt3SubStatusMultiSelect) pt3SubStatusMultiSelect.setOptions(subStatuses);
 
   document.getElementById('pt3SearchInput').oninput = ()=>{ pt3CurrentPage=1; pt3RenderTable(); };
 }
@@ -7138,13 +6963,11 @@ function pt3GetFilteredRows(){
   const q = document.getElementById('pt3SearchInput').value.trim().toLowerCase();
   const branchFilters = pt3BranchMultiSelect ? pt3BranchMultiSelect.getSelected() : [];
   const statusFilters = pt3StatusMultiSelect ? pt3StatusMultiSelect.getSelected() : [];
-  const subStatusFilters = pt3SubStatusMultiSelect ? pt3SubStatusMultiSelect.getSelected() : [];
 
   const baseRows = pt3FilterCtl.apply(pt3AGG && pt3AGG.rows ? pt3AGG.rows : pt3Rows);
   const filtered = baseRows.filter(row=>{
     if(branchFilters.length && !branchFilters.includes(pt3Get(row,'BRANCH FMC'))) return false;
     if(statusFilters.length && !statusFilters.includes(pt3Get(row,'Status'))) return false;
-    if(subStatusFilters.length && !subStatusFilters.includes(pt3Get(row,'SUB STATUS KONS'))) return false;
     if(q){
       const hay = [pt3Get(row,'ID-IHLD'), pt3Get(row,'NAMA LOP'), pt3Get(row,'STO'), pt3Get(row,'BRANCH FMC')].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
@@ -7771,7 +7594,7 @@ async function pt3fhLoadDataAuto(){
   let lastErr = null;
   for(const url of PT3FH_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -7816,8 +7639,8 @@ function pt3fhBuildDashboard(){
   pt3fhRenderPivotBranch();
   {
     const pt3fhOgpRows = pt3fhAGG.rows.filter(r=>pt3fhCategory2(r)==='ogp');
-    renderOgpBreakdownDonut('pt3fhOgpStatusDonut', pt3fhOgpRows, (r)=> hemStripStatusPrefix(pt3fhRowStatusLabel(r)).toUpperCase(), 8, pt3fhFilterCtl, (r)=> hemStripStatusPrefix(pt3fhRowStatusLabel(r)).toUpperCase(), 'Status');
-    renderOgpBreakdownDonut('pt3fhOgpSubStatusDonut', pt3fhOgpRows, (r)=> pt3fhGet(r,'SUB STATUS KONS') || 'Tidak Diketahui', 8, pt3fhFilterCtl, (r)=> pt3fhGet(r,'SUB STATUS KONS') || 'Tidak Diketahui', 'Sub Status');
+    renderOgpBreakdownDonut('pt3fhOgpStatusDonut', pt3fhOgpRows, (r)=> hemStripStatusPrefix(pt3fhRowStatusLabel(r)).toUpperCase());
+    renderOgpBreakdownDonut('pt3fhOgpSubStatusDonut', pt3fhOgpRows, (r)=> pt3fhGet(r,'SUB STATUS KONS') || 'Tidak Diketahui');
   }
   pt3fhRenderAllOrderReport();
   pt3fhSetupCommitDropdown();
@@ -8421,16 +8244,13 @@ function pt3fhSetupCommitDropdown(){
 
 const pt3fhBranchMultiSelect = makeMultiSelect('pt3fhFilterBranch', 'Semua Branch', ()=>{ pt3fhCurrentPage=1; pt3fhRenderTable(); });
 const pt3fhStatusMultiSelect = makeMultiSelect('pt3fhFilterStatus', 'Semua Status', ()=>{ pt3fhCurrentPage=1; pt3fhRenderTable(); });
-const pt3fhSubStatusMultiSelect = makeMultiSelect('pt3fhFilterSubStatus', 'Semua Sub Status', ()=>{ pt3fhCurrentPage=1; pt3fhRenderTable(); });
 
 function pt3fhSetupFilters(){
   const branches = [...new Set(pt3fhRows.map(r=>pt3fhGet(r,'BRANCH FMC')).filter(Boolean))].sort();
   const statuses = [...new Set(pt3fhRows.map(r=>pt3fhGet(r,'Status')).filter(Boolean))].sort();
-  const subStatuses = [...new Set(pt3fhRows.map(r=>pt3fhGet(r,'SUB STATUS KONS')).filter(Boolean))].sort();
 
   if(pt3fhBranchMultiSelect) pt3fhBranchMultiSelect.setOptions(branches);
   if(pt3fhStatusMultiSelect) pt3fhStatusMultiSelect.setOptions(statuses);
-  if(pt3fhSubStatusMultiSelect) pt3fhSubStatusMultiSelect.setOptions(subStatuses);
 
   document.getElementById('pt3fhSearchInput').oninput = ()=>{ pt3fhCurrentPage=1; pt3fhRenderTable(); };
 }
@@ -8439,13 +8259,11 @@ function pt3fhGetFilteredRows(){
   const q = document.getElementById('pt3fhSearchInput').value.trim().toLowerCase();
   const branchFilters = pt3fhBranchMultiSelect ? pt3fhBranchMultiSelect.getSelected() : [];
   const statusFilters = pt3fhStatusMultiSelect ? pt3fhStatusMultiSelect.getSelected() : [];
-  const subStatusFilters = pt3fhSubStatusMultiSelect ? pt3fhSubStatusMultiSelect.getSelected() : [];
 
   const baseRows = pt3fhFilterCtl.apply(pt3fhAGG && pt3fhAGG.rows ? pt3fhAGG.rows : pt3fhRows);
   const filtered = baseRows.filter(row=>{
     if(branchFilters.length && !branchFilters.includes(pt3fhGet(row,'BRANCH FMC'))) return false;
     if(statusFilters.length && !statusFilters.includes(pt3fhGet(row,'Status'))) return false;
-    if(subStatusFilters.length && !subStatusFilters.includes(pt3fhGet(row,'SUB STATUS KONS'))) return false;
     if(q){
       const hay = [pt3fhGet(row,'ID-IHLD'), pt3fhGet(row,'NAMA LOP'), pt3fhGet(row,'STO'), pt3fhGet(row,'BRANCH FMC')].join(' ').toLowerCase();
       if(!hay.includes(q)) return false;
@@ -8624,7 +8442,7 @@ async function qeRelokLoadDataAuto(){
   let lastErr = null;
   for(const url of QE_RELOK_CSV_URLS){
     try{
-      const res = await universalFetch(url, {cache:'no-store'});
+      const res = await fetch(url, {cache:'no-store'});
       if(!res.ok){ lastErr = new Error('HTTP ' + res.status); continue; }
       const text = await res.text();
       if(!text || text.trim().length === 0 || text.trim().startsWith('<')){ lastErr = new Error('Respons kosong/bukan CSV'); continue; }
@@ -9122,426 +8940,6 @@ const oloChecklistCaptureBtn = document.getElementById('oloChecklistCaptureBtn')
 if(oloChecklistCaptureBtn) oloChecklistCaptureBtn.onclick = ()=> captureAreaForPpt('oloChecklistCaptureArea','oloChecklistCaptureBtn','checklist-olo.png');
 const hemChecklistCaptureBtn = document.getElementById('hemChecklistCaptureBtn');
 if(hemChecklistCaptureBtn) hemChecklistCaptureBtn.onclick = ()=> captureAreaForPpt('hemChecklistCaptureArea','hemChecklistCaptureBtn','checklist-hem.png');
-
-/* ============================================================
-   Tombol download CSV — Daftar Work Order, semua tematik.
-   Narik SEMUA baris hasil filter (bukan cuma halaman yang lagi
-   ke-render), soalnya tabelnya pakai pagination.
-   ============================================================ */
-document.getElementById('hemDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-hem.csv', [
-    {label:'IHLD', get:r=>hemGet(r,'IHLD')},
-    {label:'Tipe Desain', get:r=>hemGet(r,'TIPE DESAIN')},
-    {label:'Nama LOP', get:r=>hemGet(r,'NAMA LOP')},
-    {label:'Witel', get:r=>hemGet(r,'WITEL')},
-    {label:'District', get:r=>hemGet(r,'DISTRICT')},
-    {label:'STO', get:r=>hemGet(r,'STO')},
-    {label:'NDE Work Order', get:r=>hemGet(r,'NDE WORK ORDER KE TA')},
-    {label:'Komitmen Golive', get:r=>hemGet(r,'Komitmen Golive')},
-    {label:'Progres Lapangan', get:r=>hemGet(r,'Progress Lapangan')},
-    {label:'Tgl Submit Order NDE', get:r=>hemGet(r,'Tanggal submit order nde')},
-    {label:'Detail Progres', get:r=>hemGet(r,'Detail Progres')},
-    {label:'Jenis Kabel', get:r=>hemGet(r,'Jenis Kabel')},
-    {label:'Panjang (m)', get:r=>hemGet(r,'Panjang Kabel (m)')},
-    {label:'No Order HEM', get:r=>hemGet(r,'NO ORDER HEM')},
-    {label:'No Order UNSC', get:r=>hemGet(r,'NO ORDER UNSC')},
-    {label:'Revenue', get:r=>hemGet(r,'REVENEU')},
-    {label:'BOQ', get:r=>hemGet(r,'BOQ')},
-  ], hemGetFilteredRows());
-};
-
-document.getElementById('oloDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-olo.csv', [
-    {label:'IHLD', get:r=>oloGet(r,'IHLD')},
-    {label:'No Order', get:r=>oloGet(r,'NO ORDER')},
-    {label:'Nama Proyek', get:r=>oloGet(r,'NAMA PROYEK')},
-    {label:'District', get:r=>oloGet(r,'DISTRICT')},
-    {label:'STO', get:r=>oloGet(r,'STO')},
-    {label:'Progres Lapangan', get:r=>oloGet(r,'Progress Lapangan')},
-    {label:'Panjang Kabel (m)', get:r=>oloGet(r,'Panjang Kabel (m)')},
-    {label:'NDE Work Order', get:r=>oloGet(r,'NDE WORK ORDER KE TA')},
-    {label:'Tanggal Order', get:r=>oloGet(r,'TANGGAL ORDER')},
-    {label:'New Komitmen GL', get:r=>oloGet(r,'NEW KOMITMEN GL')},
-    {label:'Detail Progres', get:r=>oloGet(r,'Detail Progres')},
-    {label:'TTD', get:r=>oloGet(r,'TTD')},
-    {label:'BOQ', get:r=>oloGet(r,'BOQ')},
-    {label:'Revenue', get:r=>oloGet(r,'REVENEU')},
-    {label:'Service', get:r=>oloGet(r,'SERVICE')},
-    {label:'BW', get:r=>oloGet(r,'BW')},
-    {label:'Witel', get:r=>oloGet(r,'WITEL')},
-    {label:'Prioritas', get:r=>oloGet(r,'PRIORITAS')},
-  ], oloGetFilteredRows());
-};
-
-document.getElementById('mbbDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-mbb.csv', [
-    {label:'ID', get:r=>mbbGet(r,'ID')},
-    {label:'Branch', get:r=>mbbGet(r,'BRANCH')},
-    {label:'STO', get:r=>mbbGet(r,'STO')},
-    {label:'Site Name', get:r=>mbbGet(r,'SITE NAME')},
-    {label:'Mitra', get:r=>mbbGet(r,'MITRA')},
-    {label:'Tgl WO', get:r=>mbbGet(r,'TGL WO')},
-    {label:'Status', get:r=>mbbGet(r,'STATUS')},
-    {label:'Sub Status', get:r=>mbbGet(r,'SUB STATUS')},
-    {label:'Nilai Plan', get:r=>mbbGet(r,'NILAI PLAN')},
-    {label:'Nilai DRM', get:r=>mbbGet(r,'NILAI DRM')},
-    {label:'Progress%', get:r=>mbbGet(r,'PROGRESS%')},
-    {label:'Supervisor', get:r=>mbbGet(r,'SUPERVISOR')},
-    {label:'TGL SLA HO', get:r=>mbbGet(r,'TGL SLA HO')},
-    {label:'CAT SLA HO', get:r=>mbbGet(r,'CAT SLA HO')},
-    {label:'TGL Commit OA Fix', get:r=>mbbGet(r,'TGL COMMIT OA FIX')},
-    {label:'Detail Progress', get:r=>mbbGet(r,'DETIL PROGRESS')},
-  ], mbbGetFilteredRows());
-};
-
-document.getElementById('pt3DownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-pt3ta.csv', [
-    {label:'ID', get:r=>pt3Get(r,'ID-IHLD')},
-    {label:'Branch', get:r=>pt3Get(r,'BRANCH FMC')},
-    {label:'STO', get:r=>pt3Get(r,'STO')},
-    {label:'Nama LOP', get:r=>pt3Get(r,'NAMA LOP')},
-    {label:'Mitra', get:r=>pt3Get(r,'Mitra')},
-    {label:'Tgl Order', get:r=>pt3Get(r,'Tgl Order')},
-    {label:'Status', get:r=>pt3Get(r,'Status')},
-    {label:'Sub Status', get:r=>pt3Get(r,'SUB STATUS KONS')},
-    {label:'Port Plan', get:r=>pt3Get(r,'PORT PLAN')},
-    {label:'BOQ', get:r=>pt3Get(r,'BOQ')},
-    {label:'CPP', get:r=>pt3Get(r,'CPP')},
-    {label:'Komitmen Golive', get:r=>pt3Get(r,'KOMITMEN GOLIVE')},
-    {label:'Status Golive', get:r=>pt3Get(r,'STATUS GOLIVE')},
-    {label:'Waspang', get:r=>pt3Get(r,'WASPANG')},
-    {label:'Detail Status', get:r=>pt3Get(r,'DETAIL STATUS')},
-    {label:'Diupdate', get:r=>pt3FormatUpdateDate(pt3Get(r,'DETAIL STATUS'))},
-    {label:'Jarak Update', get:r=>pt3FormatUpdateGap(pt3Get(r,'DETAIL STATUS'))},
-  ], pt3GetFilteredRows());
-};
-
-document.getElementById('pt3fhDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-pt3fh.csv', [
-    {label:'ID', get:r=>pt3fhGet(r,'ID-IHLD')},
-    {label:'Branch', get:r=>pt3fhGet(r,'BRANCH FMC')},
-    {label:'STO', get:r=>pt3fhGet(r,'STO')},
-    {label:'Nama LOP', get:r=>pt3fhGet(r,'NAMA LOP')},
-    {label:'Mitra', get:r=>pt3fhGet(r,'Mitra')},
-    {label:'Tgl Order', get:r=>pt3fhGet(r,'Tgl Order')},
-    {label:'Status', get:r=>pt3fhGet(r,'Status')},
-    {label:'Sub Status', get:r=>pt3fhGet(r,'SUB STATUS KONS')},
-    {label:'Port Plan', get:r=>pt3fhGet(r,'PORT PLAN')},
-    {label:'BOQ', get:r=>pt3fhGet(r,'BOQ')},
-    {label:'CPP', get:r=>pt3fhGet(r,'CPP')},
-    {label:'Komitmen Golive', get:r=>pt3fhGet(r,'KOMITMEN GOLIVE')},
-    {label:'Status Golive', get:r=>pt3fhGet(r,'STATUS GOLIVE')},
-    {label:'Waspang', get:r=>pt3fhGet(r,'WASPANG')},
-    {label:'Detail Status', get:r=>pt3fhGet(r,'DETAIL STATUS')},
-  ], pt3fhGetFilteredRows());
-};
-
-document.getElementById('qeRelokDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('daftar-work-order-qerelok.csv', [
-    {label:'ID', get:r=>qeRelokGet(r,'ID DIGASSS')},
-    {label:'District', get:r=>qeRelokGet(r,'DISTRICT TIF')},
-    {label:'STO', get:r=>qeRelokGet(r,'STO')},
-    {label:'Nama LOP', get:r=>qeRelokGet(r,'NAMA LOP')},
-    {label:'Batch', get:r=>qeRelokGet(r,'BATCH')},
-    {label:'Status Progres', get:r=>qeRelokGet(r,'STATUS PROGRES')},
-    {label:'Nilai Plan', get:r=>qeRelokGet(r,'NILAI PLAN')},
-    {label:'Tim Waspang', get:r=>qeRelokGet(r,'TIM WASPANG')},
-    {label:'Tim UT', get:r=>qeRelokGet(r,'TIM UT')},
-  ], qeRelokGetFilteredRows());
-};
-
-/* ============================================================
-   Halaman "Need Modul OLT" — gabungan order kendala modul OLT
-   dari PT3 TA (SUB STATUS KONS) dan MBB (SUB STATUS).
-   ============================================================ */
-function renderPt3NeedOltPage(){
-  const body = document.getElementById('pt3NeedOltTableBody');
-  const countEl = document.getElementById('pt3NeedOltCount');
-  if(!body || !pt3AGG) return;
-
-  const target = '6.4 KENDALA - MODUL OLT';
-  const matching = pt3AGG.rows.filter(row => (pt3Get(row,'SUB STATUS KONS')||'').trim().toUpperCase() === target);
-
-  if(countEl) countEl.textContent = `(${matching.length.toLocaleString('id-ID')} order)`;
-  body.innerHTML = matching.map(row => `
-    <tr>
-      <td>${pt3Get(row,'ID-IHLD')||'—'}</td>
-      <td>${pt3Get(row,'BRANCH FMC')||'—'}</td>
-      <td>${pt3Get(row,'STO')||'—'}</td>
-      <td class="name">${pt3Get(row,'NAMA LOP')||'—'}</td>
-      <td>${pt3Get(row,'Mitra')||'—'}</td>
-      <td>${pt3Get(row,'Tgl Order')||'—'}</td>
-      <td>${pt3Get(row,'Status')||'—'}</td>
-      <td>${pt3Get(row,'PORT PLAN')||'—'}</td>
-      <td>${pt3Get(row,'KOMITMEN GOLIVE')||'—'}</td>
-      <td>${pt3Get(row,'SUB STATUS KONS')||'—'}</td>
-    </tr>`).join('') || `<tr><td colspan="10" style="text-align:center;padding:24px;">Tidak ada order dengan kendala ini.</td></tr>`;
-}
-
-function renderMbbNeedOltPage(){
-  const body = document.getElementById('mbbNeedOltTableBody');
-  const countEl = document.getElementById('mbbNeedOltCount');
-  if(!body || !mbbAGG) return;
-
-  const target = '1.10 OLT PENUH NEED CONFIRM ED';
-  const matching = mbbAGG.rows.filter(row => (mbbGet(row,'SUB STATUS')||'').trim().toUpperCase() === target);
-
-  if(countEl) countEl.textContent = `(${matching.length.toLocaleString('id-ID')} order)`;
-  body.innerHTML = matching.map(row => `
-    <tr>
-      <td>${mbbGet(row,'ID')||'—'}</td>
-      <td>${mbbGet(row,'BRANCH')||'—'}</td>
-      <td>${mbbGet(row,'STO')||'—'}</td>
-      <td class="name">${mbbGet(row,'SITE NAME')||'—'}</td>
-      <td>${mbbGet(row,'MITRA')||'—'}</td>
-      <td>${mbbGet(row,'TGL WO')||'—'}</td>
-      <td>${mbbGet(row,'STATUS')||'—'}</td>
-      <td>${mbbGet(row,'TGL COMMIT OA FIX')||'—'}</td>
-      <td>${mbbGet(row,'SUB STATUS')||'—'}</td>
-    </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada order dengan kendala ini.</td></tr>`;
-}
-
-function renderOloNeedOltPage(){
-  const body = document.getElementById('oloNeedOltTableBody');
-  const countEl = document.getElementById('oloNeedOltCount');
-  if(!body || !oloAGG) return;
-
-  const target = 'MODUL OLT FULL';
-  const matching = oloAGG.rows.filter(row => (oloGet(row,'SUB STATUS')||'').trim().toUpperCase() === target);
-
-  if(countEl) countEl.textContent = `(${matching.length.toLocaleString('id-ID')} order)`;
-  body.innerHTML = matching.map(row => `
-    <tr>
-      <td>${oloGet(row,'IHLD')||'—'}</td>
-      <td>${oloGet(row,'NO ORDER')||'—'}</td>
-      <td class="name">${oloGet(row,'NAMA PROYEK')||'—'}</td>
-      <td>${oloGet(row,'DISTRICT')||'—'}</td>
-      <td>${oloGet(row,'STO')||'—'}</td>
-      <td>${oloGet(row,'TANGGAL ORDER')||'—'}</td>
-      <td>${oloGet(row,'Progress Lapangan')||'—'}</td>
-      <td>${oloGet(row,'NEW KOMITMEN GL')||'—'}</td>
-      <td>${oloGet(row,'SUB STATUS')||'—'}</td>
-    </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada order dengan kendala ini.</td></tr>`;
-}
-
-document.getElementById('pt3NeedOltDownloadBtn').onclick = ()=>{
-  const target = '6.4 KENDALA - MODUL OLT';
-  const rows = (pt3AGG ? pt3AGG.rows : []).filter(row => (pt3Get(row,'SUB STATUS KONS')||'').trim().toUpperCase() === target);
-  downloadRowsAsCsv('need-modul-olt-pt3ta.csv', [
-    {label:'ID', get:r=>pt3Get(r,'ID-IHLD')},
-    {label:'Branch', get:r=>pt3Get(r,'BRANCH FMC')},
-    {label:'STO', get:r=>pt3Get(r,'STO')},
-    {label:'Nama LOP', get:r=>pt3Get(r,'NAMA LOP')},
-    {label:'Mitra', get:r=>pt3Get(r,'Mitra')},
-    {label:'Tgl Order', get:r=>pt3Get(r,'Tgl Order')},
-    {label:'Status', get:r=>pt3Get(r,'Status')},
-    {label:'Port Plan', get:r=>pt3Get(r,'PORT PLAN')},
-    {label:'Komitmen Golive', get:r=>pt3Get(r,'KOMITMEN GOLIVE')},
-    {label:'Sub Status', get:r=>pt3Get(r,'SUB STATUS KONS')},
-  ], rows);
-};
-
-document.getElementById('mbbNeedOltDownloadBtn').onclick = ()=>{
-  const target = '1.10 OLT PENUH NEED CONFIRM ED';
-  const rows = (mbbAGG ? mbbAGG.rows : []).filter(row => (mbbGet(row,'SUB STATUS')||'').trim().toUpperCase() === target);
-  downloadRowsAsCsv('need-modul-olt-mbb.csv', [
-    {label:'ID', get:r=>mbbGet(r,'ID')},
-    {label:'Branch', get:r=>mbbGet(r,'BRANCH')},
-    {label:'STO', get:r=>mbbGet(r,'STO')},
-    {label:'Site Name', get:r=>mbbGet(r,'SITE NAME')},
-    {label:'Mitra', get:r=>mbbGet(r,'MITRA')},
-    {label:'Tgl WO', get:r=>mbbGet(r,'TGL WO')},
-    {label:'Status', get:r=>mbbGet(r,'STATUS')},
-    {label:'TGL Commit OA Fix', get:r=>mbbGet(r,'TGL COMMIT OA FIX')},
-    {label:'Sub Status', get:r=>mbbGet(r,'SUB STATUS')},
-  ], rows);
-};
-
-document.getElementById('oloNeedOltDownloadBtn').onclick = ()=>{
-  const target = 'MODUL OLT FULL';
-  const rows = (oloAGG ? oloAGG.rows : []).filter(row => (oloGet(row,'SUB STATUS')||'').trim().toUpperCase() === target);
-  downloadRowsAsCsv('need-modul-olt-olo.csv', [
-    {label:'IHLD', get:r=>oloGet(r,'IHLD')},
-    {label:'No Order', get:r=>oloGet(r,'NO ORDER')},
-    {label:'Nama Proyek', get:r=>oloGet(r,'NAMA PROYEK')},
-    {label:'District', get:r=>oloGet(r,'DISTRICT')},
-    {label:'STO', get:r=>oloGet(r,'STO')},
-    {label:'Tanggal Order', get:r=>oloGet(r,'TANGGAL ORDER')},
-    {label:'Progres Lapangan', get:r=>oloGet(r,'Progress Lapangan')},
-    {label:'New Komitmen GL', get:r=>oloGet(r,'NEW KOMITMEN GL')},
-    {label:'Sub Status', get:r=>oloGet(r,'SUB STATUS')},
-  ], rows);
-};
-
-/* ============================================================
-   Sumber data terpisah — "Laporan Usulan Mini OLT Thn 2026".
-   Dipakai khusus buat section tambahan di halaman "Need Modul OLT".
-   Header row-nya dicari otomatis (bukan baris 1 tetap), soalnya
-   sheet ini punya beberapa baris banner/nomor sebelum header asli.
-   ============================================================ */
-const MINIOLT_CSV_URLS = [
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTngpmA9kSKiTWR66H6bwnx0fhd4AnNmP4q5PjhtNj0YOK1s1CdK2ZXhCWd53Zrgf2z_8SLdIupxceU/pub?gid=1945726319&single=true&output=csv",
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTngpmA9kSKiTWR66H6bwnx0fhd4AnNmP4q5PjhtNj0YOK1s1CdK2ZXhCWd53Zrgf2z_8SLdIupxceU/pub?output=csv",
-  "https://docs.google.com/spreadsheets/d/1q_pD2_-2deg-sYSZdPHQNTjGJAhnVpz3svu5RH4Ht4c/gviz/tq?tqx=out:csv&gid=1945726319",
-  "https://docs.google.com/spreadsheets/d/1q_pD2_-2deg-sYSZdPHQNTjGJAhnVpz3svu5RH4Ht4c/export?format=csv&gid=1945726319",
-];
-
-const MINIOLT_COLS = [
-  { key:'branch', match: h => h.toUpperCase() === 'NEW TA BRANCH' },
-  { key:'sto', match: h => h.toUpperCase() === 'STO' },
-  { key:'tahun', match: h => h.toUpperCase() === 'TAHUN' },
-  { key:'jenisOrder', match: h => h.toUpperCase() === 'JENIS ORDER' },
-  { key:'idIhld', match: h => h.toUpperCase() === 'ID IHLD' },
-  { key:'cluster', match: h => h.toUpperCase() === 'CLUSTER' },
-  { key:'portPlan', match: h => h.toUpperCase().startsWith('PORT PLAN') },
-  { key:'kebutuhan', match: h => h.toUpperCase() === 'KEBUTUHAN MINI OLT' },
-  { key:'siteId', match: h => h.toUpperCase().startsWith('SITE ID') },
-  { key:'tglInput', match: h => h.toUpperCase().startsWith('TGL INPUT GDOC') },
-  { key:'remark', match: h => h.toUpperCase() === 'REMARK' },
-  { key:'statusOsp', match: h => h.toUpperCase() === 'STATUS OSP' },
-  { key:'prioritas', match: h => h.toUpperCase().startsWith('PRIORITAS AJUAN KE ISP') },
-  { key:'planFiGl', match: h => h.toUpperCase().startsWith('PLAN FI/GL OSP') },
-];
-
-let miniOltRows = [];
-let miniOltColIdx = {};
-
-function miniOltProcessCSVText(text){
-  const parsed = Papa.parse(text, { header:false, skipEmptyLines:true });
-  const data = parsed.data;
-
-  // Cari baris header dengan nyari baris yang punya sel persis "ID IHLD"
-  let headerRowIdx = -1;
-  for(let r = 0; r < Math.min(data.length, 15); r++){
-    if((data[r]||[]).some(cell => (cell||'').toString().trim().toUpperCase() === 'ID IHLD')){
-      headerRowIdx = r;
-      break;
-    }
-  }
-  if(headerRowIdx === -1){ miniOltRows = []; return; }
-
-  const headers = data[headerRowIdx].map(h => (h||'').toString().trim());
-  miniOltColIdx = {};
-  MINIOLT_COLS.forEach(col=>{
-    miniOltColIdx[col.key] = headers.findIndex(h => col.match(h));
-  });
-
-  miniOltRows = data.slice(headerRowIdx + 1)
-    .filter(row => row && row.some(c => (c||'').toString().trim() !== ''));
-}
-
-function miniOltGet(row, key){
-  const idx = miniOltColIdx[key];
-  if(idx === undefined || idx === -1) return '';
-  return (row[idx] || '').toString().trim();
-}
-
-const MINIOLT_TARGET_BRANCHES = ['BANDA ACEH','BINJAI','MEDAN','RANTAU PRAPAT','PADANG SIDEMPUAN','PEMATANG SIANTAR'];
-
-const miniOltBranchMultiSelect = makeMultiSelect('miniOltFilterBranch', 'Semua Branch', ()=> renderMiniOltNeedOltPage());
-const miniOltJenisOrderMultiSelect = makeMultiSelect('miniOltFilterJenisOrder', 'Semua Jenis Order', ()=> renderMiniOltNeedOltPage());
-const miniOltStatusOspMultiSelect = makeMultiSelect('miniOltFilterStatusOsp', 'Semua Status OSP', ()=> renderMiniOltNeedOltPage());
-const miniOltPrioritasMultiSelect = makeMultiSelect('miniOltFilterPrioritas', 'Semua Prioritas', ()=> renderMiniOltNeedOltPage());
-
-function miniOltSetupFilters(){
-  const base = miniOltRows.filter(row => MINIOLT_TARGET_BRANCHES.includes(miniOltGet(row,'branch').toUpperCase()));
-  const branches = [...new Set(base.map(r=>miniOltGet(r,'branch')).filter(Boolean))].sort();
-  const jenisOrders = [...new Set(base.map(r=>miniOltGet(r,'jenisOrder')).filter(Boolean))].sort();
-  const statusOsps = [...new Set(base.map(r=>miniOltGet(r,'statusOsp')).filter(Boolean))].sort();
-  const prioritasList = [...new Set(base.map(r=>miniOltGet(r,'prioritas')).filter(Boolean))].sort();
-
-  if(miniOltBranchMultiSelect) miniOltBranchMultiSelect.setOptions(branches);
-  if(miniOltJenisOrderMultiSelect) miniOltJenisOrderMultiSelect.setOptions(jenisOrders);
-  if(miniOltStatusOspMultiSelect) miniOltStatusOspMultiSelect.setOptions(statusOsps);
-  if(miniOltPrioritasMultiSelect) miniOltPrioritasMultiSelect.setOptions(prioritasList);
-
-  const searchInput = document.getElementById('miniOltSearchInput');
-  if(searchInput) searchInput.oninput = ()=> renderMiniOltNeedOltPage();
-}
-
-function miniOltMatchingRows(){
-  const q = (document.getElementById('miniOltSearchInput')?.value || '').trim().toLowerCase();
-  const branchFilters = miniOltBranchMultiSelect ? miniOltBranchMultiSelect.getSelected() : [];
-  const jenisFilters = miniOltJenisOrderMultiSelect ? miniOltJenisOrderMultiSelect.getSelected() : [];
-  const statusFilters = miniOltStatusOspMultiSelect ? miniOltStatusOspMultiSelect.getSelected() : [];
-  const prioritasFilters = miniOltPrioritasMultiSelect ? miniOltPrioritasMultiSelect.getSelected() : [];
-
-  return miniOltRows.filter(row=>{
-    if(!MINIOLT_TARGET_BRANCHES.includes(miniOltGet(row,'branch').toUpperCase())) return false;
-    if(branchFilters.length && !branchFilters.includes(miniOltGet(row,'branch'))) return false;
-    if(jenisFilters.length && !jenisFilters.includes(miniOltGet(row,'jenisOrder'))) return false;
-    if(statusFilters.length && !statusFilters.includes(miniOltGet(row,'statusOsp'))) return false;
-    if(prioritasFilters.length && !prioritasFilters.includes(miniOltGet(row,'prioritas'))) return false;
-    if(q){
-      const hay = [miniOltGet(row,'idIhld'), miniOltGet(row,'cluster')].join(' ').toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
-    return true;
-  });
-}
-
-function renderMiniOltNeedOltPage(){
-  const body = document.getElementById('miniOltNeedOltTableBody');
-  const countEl = document.getElementById('miniOltNeedOltCount');
-  if(!body) return;
-
-  const matching = miniOltMatchingRows();
-  if(countEl) countEl.textContent = `(${matching.length.toLocaleString('id-ID')} order)`;
-  body.innerHTML = matching.map(row => `
-    <tr>
-      <td>${miniOltGet(row,'branch')||'—'}</td>
-      <td>${miniOltGet(row,'sto')||'—'}</td>
-      <td>${miniOltGet(row,'tahun')||'—'}</td>
-      <td>${miniOltGet(row,'jenisOrder')||'—'}</td>
-      <td>${miniOltGet(row,'idIhld')||'—'}</td>
-      <td class="name">${miniOltGet(row,'cluster')||'—'}</td>
-      <td>${miniOltGet(row,'portPlan')||'—'}</td>
-      <td>${miniOltGet(row,'kebutuhan')||'—'}</td>
-      <td>${miniOltGet(row,'siteId')||'—'}</td>
-      <td>${miniOltGet(row,'tglInput')||'—'}</td>
-      <td>${miniOltGet(row,'remark')||'—'}</td>
-      <td>${miniOltGet(row,'statusOsp')||'—'}</td>
-      <td>${miniOltGet(row,'prioritas')||'—'}</td>
-      <td>${miniOltGet(row,'planFiGl')||'—'}</td>
-    </tr>`).join('') || `<tr><td colspan="14" style="text-align:center;padding:24px;">Tidak ada data.</td></tr>`;
-}
-
-async function miniOltLoadDataAuto(){
-  let text = null;
-  for(const url of MINIOLT_CSV_URLS){
-    try{
-      const res = await universalFetch(url, {cache:'no-store'});
-      if(!res.ok) continue;
-      const t = await res.text();
-      if(t && t.trim().length > 0 && !t.trim().startsWith('<')){ text = t; break; }
-    }catch(e){ /* coba url berikutnya */ }
-  }
-  if(!text) return;
-  miniOltProcessCSVText(text);
-  miniOltSetupFilters();
-  renderMiniOltNeedOltPage();
-}
-
-document.getElementById('miniOltNeedOltDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('need-modul-olt-miniolt.csv', [
-    {label:'NEW TA Branch', get:r=>miniOltGet(r,'branch')},
-    {label:'STO', get:r=>miniOltGet(r,'sto')},
-    {label:'Tahun', get:r=>miniOltGet(r,'tahun')},
-    {label:'Jenis Order', get:r=>miniOltGet(r,'jenisOrder')},
-    {label:'ID IHLD', get:r=>miniOltGet(r,'idIhld')},
-    {label:'Cluster', get:r=>miniOltGet(r,'cluster')},
-    {label:'Port Plan', get:r=>miniOltGet(r,'portPlan')},
-    {label:'Kebutuhan Mini OLT', get:r=>miniOltGet(r,'kebutuhan')},
-    {label:'Site ID / Location', get:r=>miniOltGet(r,'siteId')},
-    {label:'Tgl Input Gdoc', get:r=>miniOltGet(r,'tglInput')},
-    {label:'Remark', get:r=>miniOltGet(r,'remark')},
-    {label:'Status OSP', get:r=>miniOltGet(r,'statusOsp')},
-    {label:'Prioritas Ajuan ke ISP', get:r=>miniOltGet(r,'prioritas')},
-    {label:'Plan FI/GL OSP', get:r=>miniOltGet(r,'planFiGl')},
-  ], miniOltMatchingRows());
-};
-
-miniOltLoadDataAuto();
 
 hemLoadDataAuto();
 oloLoadDataAuto();
