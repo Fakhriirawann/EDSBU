@@ -309,7 +309,6 @@
   .hem-catatan-submit{flex-shrink:0;background:var(--cyan);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;padding:6px 10px;border-radius:6px;cursor:pointer;transition:opacity .15s;}
   .hem-catatan-submit:hover{opacity:.88;}
   .hem-catatan-history{width:200px;max-height:90px;overflow-y:auto;font-size:11.5px;color:var(--text-dim);line-height:1.5;margin-bottom:6px;padding:6px 8px;background:var(--panel-2);border-radius:6px;white-space:normal;}
-  .status-pt1-select{font-family:'Inter',sans-serif;font-size:12px;padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);cursor:pointer;transition:border-color .2s;}
   .hem-progres-box{width:280px;max-height:120px;overflow-y:auto;white-space:normal;background:var(--panel-2);border-radius:8px;padding:8px 10px;}
   .hem-progres-item{font-size:12px;color:var(--text-dim);line-height:1.5;padding:3px 0;border-bottom:1px dashed var(--line);}
   .hem-progres-item:last-child{border-bottom:none;}
@@ -366,7 +365,6 @@
     <button class="page-tab" id="tabBtnKomitmenGL" type="button">🎯 Komitmen GL</button>
     <button class="page-tab" id="tabBtnChecklist" type="button">☑️ Checklist</button>
     <button class="page-tab" id="tabBtnNeedOlt" type="button">🔧 Need Modul OLT</button>
-    <button class="page-tab" id="tabBtnGolive" type="button">🟢 Golive</button>
   </div>
 
   <div id="pagePT2">
@@ -802,7 +800,7 @@
                 <th class="sortable" data-field="Progress Lapangan">Progres Lapangan<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="Tanggal submit order nde">Tgl Submit Order NDE<span class="sort-arrow">▲▼</span></th>
                 <th>Detail Progres</th>
-                <th>Status PT1</th>
+                <th class="sortable" data-field="Jenis Kabel">Jenis Kabel<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="Panjang Kabel (m)" data-numeric="true">Panjang (m)<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="NO ORDER HEM">No Order HEM<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="NO ORDER UNSC">No Order UNSC<span class="sort-arrow">▲▼</span></th>
@@ -962,7 +960,7 @@
 
       <div class="section" id="oloWorkOrderSection">
         <p class="section-title">Daftar Work Order OLO</p>
-        <p class="section-desc">Cari dan filter untuk melihat detail tiap order. Kolom "Catatan" bisa langsung diedit — otomatis tersimpan ke kolom T di Google Sheets.</p>
+        <p class="section-desc">Cari dan filter untuk melihat detail tiap order.</p>
         <div id="oloActiveFilterBadge" class="active-filter-badge" style="display:none;"></div>
         <div class="filters">
           <input type="text" id="oloSearchInput" placeholder="Cari IHLD, Nama Proyek, STO...">
@@ -1000,13 +998,11 @@
                 <th class="sortable" data-field="TANGGAL ORDER">Tanggal Order<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="NEW KOMITMEN GL">New Komitmen GL<span class="sort-arrow">▲▼</span></th>
                 <th>Detail Progres</th>
-                <th>Status PT1</th>
                 <th class="sortable" data-field="TTD" data-numeric="true">TTD<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="BOQ" data-numeric="true">BOQ<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="REVENEU" data-numeric="true">Revenue<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="SERVICE">Service<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="BW">BW<span class="sort-arrow">▲▼</span></th>
-                <th>Catatan</th>
               </tr>
             </thead>
             <tbody id="oloTableBody"></tbody>
@@ -2101,58 +2097,6 @@
               </tr>
             </thead>
             <tbody id="miniOltNeedOltTableBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    </div>
-
-    <div id="pageGolive" style="display:none;">
-
-    <div id="goliveCaptureArea">
-      <div class="section" style="margin-top:0;">
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <div>
-            <p class="section-title" style="margin-bottom:2px;">Golive</p>
-            <p class="section-desc" style="margin:0;">Monitoring Golive TREG1 (sheet TR1), difilter Regional = Sumbagut.</p>
-          </div>
-          <button type="button" class="download-btn capture-hide" id="goliveDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <div class="filters">
-          <input type="text" id="goliveSearchInput" placeholder="Cari Nama LOP, STO, ODC, ODP...">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="date" id="goliveDateFrom" class="period-select" style="padding:8px 10px;">
-            <span style="color:var(--text-faint);font-size:12px;">s/d</span>
-            <input type="date" id="goliveDateTo" class="period-select" style="padding:8px 10px;">
-          </div>
-          <div class="multiselect" id="goliveFilterBranchWrap">
-            <button type="button" class="multiselect-btn" id="goliveFilterBranchBtn">Semua Branch <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="goliveFilterBranchPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="goliveFilterTematikWrap">
-            <button type="button" class="multiselect-btn" id="goliveFilterTematikBtn">Semua Tematik <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="goliveFilterTematikPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="goliveFilterSubTematikWrap">
-            <button type="button" class="multiselect-btn" id="goliveFilterSubTematikBtn">Semua Sub Tematik <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="goliveFilterSubTematikPanel" style="display:none;"></div>
-          </div>
-          <div class="multiselect" id="goliveFilterBulanWrap">
-            <button type="button" class="multiselect-btn" id="goliveFilterBulanBtn">Semua Bulan <span class="chev">▾</span></button>
-            <div class="multiselect-panel" id="goliveFilterBulanPanel" style="display:none;"></div>
-          </div>
-          <span class="count" id="goliveResultCount"></span>
-        </div>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th class="sortable" id="goliveSortTglGolive" style="cursor:pointer;">Tanggal Golive <span class="sort-arrow">▲▼</span></th><th>Bulan</th><th>Nama LOP</th><th>STO</th><th>Branch</th>
-                <th>Sub Tematik</th><th>Tematik</th><th>Nama ODC</th><th>Nama ODP</th>
-              </tr>
-            </thead>
-            <tbody id="goliveTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -4716,7 +4660,6 @@ function hemRenderTable(){
       <td>${hemGet(row,'Progress Lapangan')||'—'}</td>
       <td>${hemGet(row,'Tanggal submit order nde')||'—'}</td>
       <td>${hemFormatDetailProgres(detailProgres)}</td>
-      <td>${renderStatusPT1Cell('hem', ihld, getByColLetter(row,'Y'))}</td>
       <td>${hemGet(row,'Jenis Kabel')||'—'}</td>
       <td>${hemGet(row,'Panjang Kabel (m)')||'—'}</td>
       <td>${hemGet(row,'NO ORDER HEM')||'—'}</td>
@@ -4727,10 +4670,14 @@ function hemRenderTable(){
       <td><span class="badge ${badgeClass}">${hemGet(row,'SLA')||'—'}</span></td>
       <td>${hemGet(row,'TTD')||'—'}</td>
       <td>
-        ${renderCatatanCell('hem', ihld, catatan)}
+        <div class="hem-catatan-history" data-ihld-history="${esc(ihld)}">${catatan ? esc(catatan).replace(/\n/g,'<br>') : ''}</div>
+        <div class="hem-catatan-row">
+          <input type="text" class="hem-catatan-input" data-ihld="${esc(ihld)}" value="" placeholder="+ Tambah catatan baru...">
+          <button type="button" class="hem-catatan-submit" data-ihld-submit="${esc(ihld)}">Simpan</button>
+        </div>
       </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="22" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
+  }).join('') || `<tr><td colspan="21" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
 
   document.getElementById('hemPageInfo').textContent = `Halaman ${hemCurrentPage} dari ${totalPages}`;
   document.getElementById('hemPrevPage').disabled = hemCurrentPage <= 1;
@@ -4739,8 +4686,22 @@ function hemRenderTable(){
   // Simpan Catatan BARU ke Google Sheets (kolom W, di-APPEND bukan ditimpa)
   // cuma kejadian kalau klik tombol "Simpan" atau tekan Enter — nggak lagi
   // otomatis pas blur/klik keluar, biar nggak kesimpan nggak sengaja.
-  wireCatatanUI('hem', 'HEM');
-  wireStatusPT1UI('hem', 'HEM');
+  document.querySelectorAll('.hem-catatan-input').forEach(input=>{
+    const saveIt = ()=>{
+      const text = input.value.trim();
+      if(!text) return;
+      hemSaveCatatan(input.dataset.ihld, text, input);
+    };
+    input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ saveIt(); } });
+  });
+  document.querySelectorAll('.hem-catatan-submit').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.querySelector(`.hem-catatan-input[data-ihld="${btn.dataset.ihldSubmit}"]`);
+      const text = input.value.trim();
+      if(!text) return;
+      hemSaveCatatan(btn.dataset.ihldSubmit, text, input);
+    });
+  });
 }
 
 document.getElementById('hemPrevPage').onclick = ()=>{ if(hemCurrentPage>1){ hemCurrentPage--; hemRenderTable(); } };
@@ -4751,107 +4712,7 @@ document.getElementById('hemNextPage').onclick = ()=>{ hemCurrentPage++; hemRend
  * ke kolom W di sheet "HEM KE TELE" (bukan menimpa isi lama), dicocokkan
  * berdasarkan IHLD. GANTI URL di bawah kalau redeploy Apps Script.
  */
-const HEM_WRITE_API_URL = 'https://script.google.com/macros/s/AKfycbxKC7F8v9UtFfAtKJBIoDs9Do0Twj4UYwraID4614iGBeWcH9cV2Zzs17Xc2HDoHXRb/exec';
-
-/**
- * Helper bersama buat fitur "Catatan" & "Status PT1" (HEM + OLO) — nulis
- * balik ke Google Sheets lewat Apps Script Web App yang sama (WRITE_API_URL).
- */
-const WRITE_API_URL = HEM_WRITE_API_URL; // 1 Web App yang sama nangani HEM & OLO (bedain lewat parameter "sheet")
-
-/* Konversi huruf kolom (misal "Y", "AA") jadi index array 0-based */
-function colLetterToIndex(letter){
-  let result = 0;
-  const s = (letter || '').toString().toUpperCase();
-  for(let i=0;i<s.length;i++){
-    result = result * 26 + (s.charCodeAt(i) - 64);
-  }
-  return result - 1;
-}
-/* Ambil nilai dari row (array CSV mentah) berdasarkan huruf kolom Sheets,
-   dipakai buat kolom yang gak punya header/nama jelas (misal Status PT1). */
-function getByColLetter(row, letter){
-  const idx = colLetterToIndex(letter);
-  const v = row[idx];
-  return (v === undefined || v === null) ? '' : v.toString().trim();
-}
-
-/* Render 2 sel "Status PT1" (dropdown) yang dipake bareng HEM & OLO. */
-function renderStatusPT1Cell(prefix, ihld, currentValue){
-  const esc = (s)=> (s||'').toString().replace(/"/g,'&quot;');
-  const opts = ['', 'OPEN', 'Closed PT1'];
-  return `<select class="status-pt1-select" data-status-prefix="${prefix}" data-ihld="${esc(ihld)}">
-    ${opts.map(o=> `<option value="${esc(o)}" ${o===currentValue?'selected':''}>${o || '— pilih —'}</option>`).join('')}
-  </select>`;
-}
-async function saveStatusPT1(sheetKey, ihld, status, selectEl){
-  if(selectEl) selectEl.style.borderColor = 'var(--amber)';
-  try{
-    const url = WRITE_API_URL + '?action=updateStatusPT1&sheet=' + sheetKey + '&ihld=' + encodeURIComponent(ihld) + '&status=' + encodeURIComponent(status);
-    const res = await universalFetch(url, {cache:'no-store'});
-    const data = await res.json();
-    if(selectEl) selectEl.style.borderColor = data.ok ? 'var(--emerald)' : 'var(--red)';
-    if(!data.ok) console.error('Gagal simpan Status PT1:', data.error);
-    setTimeout(()=>{ if(selectEl) selectEl.style.borderColor = ''; }, 1500);
-  }catch(err){
-    if(selectEl) selectEl.style.borderColor = 'var(--red)';
-    console.error('Gagal simpan Status PT1:', err.message);
-  }
-}
-function wireStatusPT1UI(prefix, sheetKey){
-  document.querySelectorAll(`.status-pt1-select[data-status-prefix="${prefix}"]`).forEach(sel=>{
-    sel.onchange = ()=> saveStatusPT1(sheetKey, sel.dataset.ihld, sel.value, sel);
-  });
-}
-
-/* Render sel "Catatan" (history + input tambah baru), dipake bareng HEM & OLO. */
-function renderCatatanCell(prefix, ihld, catatanText){
-  const esc = (s)=> (s||'').toString().replace(/"/g,'&quot;');
-  return `
-    <div class="hem-catatan-history" data-catatan-prefix="${prefix}" data-ihld-history="${esc(ihld)}">${catatanText ? esc(catatanText).replace(/\n/g,'<br>') : ''}</div>
-    <div class="hem-catatan-row">
-      <input type="text" class="hem-catatan-input" data-catatan-prefix="${prefix}" data-ihld="${esc(ihld)}" value="" placeholder="+ Tambah catatan baru...">
-      <button type="button" class="hem-catatan-submit" data-catatan-prefix="${prefix}" data-ihld-submit="${esc(ihld)}">Simpan</button>
-    </div>`;
-}
-async function saveCatatanGeneric(prefix, sheetKey, ihld, text, inputEl){
-  if(inputEl) inputEl.style.borderColor = 'var(--amber)';
-  try{
-    const url = WRITE_API_URL + '?action=updateCatatan&sheet=' + sheetKey + '&ihld=' + encodeURIComponent(ihld) + '&text=' + encodeURIComponent(text);
-    const res = await universalFetch(url, {cache:'no-store'});
-    const data = await res.json();
-    if(inputEl) inputEl.style.borderColor = data.ok ? 'var(--emerald)' : 'var(--red)';
-    if(data.ok){
-      inputEl.value = '';
-      const historyBox = document.querySelector(`.hem-catatan-history[data-catatan-prefix="${prefix}"][data-ihld-history="${CSS.escape(ihld)}"]`);
-      if(historyBox && data.isiTerbaru) historyBox.innerHTML = data.isiTerbaru.replace(/\n/g,'<br>');
-    } else {
-      console.error('Gagal simpan Catatan:', data.error);
-    }
-    setTimeout(()=>{ if(inputEl) inputEl.style.borderColor = ''; }, 1500);
-  }catch(err){
-    if(inputEl) inputEl.style.borderColor = 'var(--red)';
-    console.error('Gagal simpan Catatan:', err.message);
-  }
-}
-function wireCatatanUI(prefix, sheetKey){
-  document.querySelectorAll(`.hem-catatan-input[data-catatan-prefix="${prefix}"]`).forEach(input=>{
-    const saveIt = ()=>{
-      const text = input.value.trim();
-      if(!text) return;
-      saveCatatanGeneric(prefix, sheetKey, input.dataset.ihld, text, input);
-    };
-    input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ saveIt(); } });
-  });
-  document.querySelectorAll(`.hem-catatan-submit[data-catatan-prefix="${prefix}"]`).forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const input = document.querySelector(`.hem-catatan-input[data-catatan-prefix="${prefix}"][data-ihld="${btn.dataset.ihldSubmit}"]`);
-      const text = input.value.trim();
-      if(!text) return;
-      saveCatatanGeneric(prefix, sheetKey, btn.dataset.ihldSubmit, text, input);
-    });
-  });
-}
+const HEM_WRITE_API_URL = 'https://script.google.com/macros/s/AKfycbyo74EfRXqaDE1RdS4noGkHTdNTKSlSHFgSgITUYx2495f7vNZ9RMW31cMiJFDJTP0e/exec';
 
 async function hemSaveCatatan(ihld, text, inputEl){
   if(!HEM_WRITE_API_URL || HEM_WRITE_API_URL.indexOf('GANTI_DENGAN') === 0){
@@ -5411,10 +5272,8 @@ function oloRenderTable(){
 
   document.getElementById('oloTableBody').innerHTML = pageRows.map(row=>{
     const detailProgres = oloGet(row,'Detail Progres');
-    const ihld = oloGet(row,'IHLD');
-    const catatan = getByColLetter(row,'T');
     return `<tr>
-      <td>${ihld||'—'}</td>
+      <td>${oloGet(row,'IHLD')||'—'}</td>
       <td>${oloGet(row,'NO ORDER')||'—'}</td>
       <td class="name">${oloGet(row,'NAMA PROYEK')||'—'}</td>
       <td>${oloGet(row,'DISTRICT')||'—'}</td>
@@ -5425,24 +5284,17 @@ function oloRenderTable(){
       <td>${oloGet(row,'TANGGAL ORDER')||'—'}</td>
       <td>${oloGet(row,'NEW KOMITMEN GL')||'—'}</td>
       <td>${hemFormatDetailProgres(detailProgres)}</td>
-      <td>${renderStatusPT1Cell('olo', ihld, getByColLetter(row,'S'))}</td>
       <td>${oloGet(row,'TTD')||'—'}</td>
       <td>${fmtIDR(oloParseNum(oloGet(row,'BOQ')))}</td>
       <td>${fmtIDR(oloParseNum(oloGet(row,'REVENEU')))}</td>
       <td>${oloGet(row,'SERVICE')||'—'}</td>
       <td>${oloGet(row,'BW')||'—'}</td>
-      <td>
-        ${renderCatatanCell('olo', ihld, catatan)}
-      </td>
     </tr>`;
-  }).join('') || `<tr><td colspan="18" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
+  }).join('') || `<tr><td colspan="16" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
 
   document.getElementById('oloPageInfo').textContent = `Halaman ${oloCurrentPage} dari ${totalPages}`;
   document.getElementById('oloPrevPage').disabled = oloCurrentPage <= 1;
   document.getElementById('oloNextPage').disabled = oloCurrentPage >= totalPages;
-
-  wireCatatanUI('olo', 'OLO');
-  wireStatusPT1UI('olo', 'OLO');
 }
 
 document.getElementById('oloPrevPage').onclick = ()=>{ if(oloCurrentPage>1){ oloCurrentPage--; oloRenderTable(); } };
@@ -5450,7 +5302,7 @@ document.getElementById('oloNextPage').onclick = ()=>{ oloCurrentPage++; oloRend
 
 /* ---------- Tab switching (3 tab) ---------- */
 function switchTab(active){
-  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'], needOlt:['tabBtnNeedOlt','pageNeedOlt'], golive:['tabBtnGolive','pageGolive'] };
+  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'], needOlt:['tabBtnNeedOlt','pageNeedOlt'] };
   Object.keys(tabs).forEach(key=>{
     const [btnId, pageId] = tabs[key];
     const isActive = key === active;
@@ -5469,7 +5321,6 @@ document.getElementById('tabBtnLapPt2').onclick = ()=> switchTab('lapPt2');
 document.getElementById('tabBtnKomitmenGL').onclick = ()=> switchTab('komitmenGL');
 document.getElementById('tabBtnChecklist').onclick = ()=> switchTab('checklist');
 document.getElementById('tabBtnNeedOlt').onclick = ()=> switchTab('needOlt');
-document.getElementById('tabBtnGolive').onclick = ()=> switchTab('golive');
 
 const hemStageDetailCloseBtn = document.getElementById('hemStageDetailCloseBtn');
 if(hemStageDetailCloseBtn) hemStageDetailCloseBtn.onclick = hemHideStageDetail;
@@ -9691,197 +9542,6 @@ document.getElementById('miniOltNeedOltDownloadBtn').onclick = ()=>{
 };
 
 miniOltLoadDataAuto();
-
-/* ============================================================
-   Halaman "Golive" — sumber: "Monitoring Golive TREG1 tahun 2026",
-   sheet TR1. Header row & kolom REGIONAL dicari otomatis (bukan
-   asumsi baris/posisi tetap), difilter Regional = Sumbagut.
-   ============================================================ */
-const GOLIVE_CSV_URLS = [
-  "https://docs.google.com/spreadsheets/d/1u3-KOnFU0d_Jjlr-gb-ubenpThnW2zeDp_aMTvbUXQg/gviz/tq?tqx=out:csv&gid=505779084",
-  "https://docs.google.com/spreadsheets/d/1u3-KOnFU0d_Jjlr-gb-ubenpThnW2zeDp_aMTvbUXQg/export?format=csv&gid=505779084",
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTeX4a-U19NvPfdMlkuG9ZY5nvGH27VQNsUkf6bzXqcp37JmkWR18gQd43876z1BsxN08G7PdwQT_qN/pub?gid=505779084&single=true&output=csv",
-];
-
-const GOLIVE_COLS = [
-  { key:'tglGolive', match: h => h.toUpperCase().includes('TANGGAL GOLIVE') || h.toUpperCase() === 'TGL GOLIVE' },
-  { key:'bulan', match: h => h.toUpperCase() === 'BULAN' },
-  { key:'namaLop', match: h => h.toUpperCase() === 'NAMA LOP' },
-  { key:'sto', match: h => h.toUpperCase() === 'STO' },
-  { key:'branch', match: h => h.toUpperCase() === 'BRANCH' },
-  { key:'subTematik', match: h => h.toUpperCase() === 'SUB TEMATIK' },
-  { key:'tematik', match: h => h.toUpperCase() === 'TEMATIK' },
-  { key:'namaOdc', match: h => h.toUpperCase() === 'NAMA ODC' },
-  { key:'namaOdp', match: h => h.toUpperCase().replace(/\s+/g,'') === 'NAMAODP' },
-  { key:'regional', match: h => h.toUpperCase().includes('REGIONAL') },
-];
-
-let goliveRows = [];
-let goliveColIdx = {};
-
-function goliveProcessCSVText(text){
-  const parsed = Papa.parse(text, { header:false, skipEmptyLines:true });
-  const data = parsed.data;
-
-  // Cari baris header dengan nyari baris yang punya sel persis "NAMA LOP"
-  let headerRowIdx = -1;
-  for(let r = 0; r < Math.min(data.length, 15); r++){
-    if((data[r]||[]).some(cell => (cell||'').toString().trim().toUpperCase() === 'NAMA LOP')){
-      headerRowIdx = r;
-      break;
-    }
-  }
-  if(headerRowIdx === -1){ goliveRows = []; return; }
-
-  const headers = data[headerRowIdx].map(h => (h||'').toString().trim());
-  goliveColIdx = {};
-  GOLIVE_COLS.forEach(col=>{
-    goliveColIdx[col.key] = headers.findIndex(h => col.match(h));
-  });
-
-  const allRows = data.slice(headerRowIdx + 1)
-    .filter(row => row && row.some(c => (c||'').toString().trim() !== ''));
-
-  // Filter Regional = Sumbagut (kalau kolomnya kedetect; kalau nggak ada, tampilin semua biar gak silent-empty)
-  if(goliveColIdx.regional !== -1){
-    goliveRows = allRows.filter(row => (row[goliveColIdx.regional]||'').toString().trim().toUpperCase() === 'SUMBAGUT');
-  }else{
-    goliveRows = allRows;
-  }
-}
-
-function goliveGet(row, key){
-  const idx = goliveColIdx[key];
-  if(idx === undefined || idx === -1) return '';
-  return (row[idx] || '').toString().trim();
-}
-
-const goliveBranchMultiSelect = makeMultiSelect('goliveFilterBranch', 'Semua Branch', ()=> goliveRenderTable());
-const goliveTematikMultiSelect = makeMultiSelect('goliveFilterTematik', 'Semua Tematik', ()=> goliveRenderTable());
-const goliveSubTematikMultiSelect = makeMultiSelect('goliveFilterSubTematik', 'Semua Sub Tematik', ()=> goliveRenderTable());
-const goliveBulanMultiSelect = makeMultiSelect('goliveFilterBulan', 'Semua Bulan', ()=> goliveRenderTable());
-
-function goliveSetupFilters(){
-  const branches = [...new Set(goliveRows.map(r=>goliveGet(r,'branch')).filter(Boolean))].sort();
-  const tematiks = [...new Set(goliveRows.map(r=>goliveGet(r,'tematik')).filter(Boolean))].sort();
-  const subTematiks = [...new Set(goliveRows.map(r=>goliveGet(r,'subTematik')).filter(Boolean))].sort();
-  const bulans = [...new Set(goliveRows.map(r=>goliveGet(r,'bulan')).filter(Boolean))].sort();
-
-  goliveBranchMultiSelect.setOptions(branches);
-  goliveTematikMultiSelect.setOptions(tematiks);
-  goliveSubTematikMultiSelect.setOptions(subTematiks);
-  goliveBulanMultiSelect.setOptions(bulans);
-
-  document.getElementById('goliveSearchInput').oninput = ()=> goliveRenderTable();
-  document.getElementById('goliveDateFrom').onchange = ()=> goliveRenderTable();
-  document.getElementById('goliveDateTo').onchange = ()=> goliveRenderTable();
-}
-
-let goliveSortDir = 'desc'; // default: tanggal terbaru duluan
-
-function goliveGetFilteredRows(){
-  const q = document.getElementById('goliveSearchInput').value.trim().toLowerCase();
-  const branchFilters = goliveBranchMultiSelect.getSelected();
-  const tematikFilters = goliveTematikMultiSelect.getSelected();
-  const subTematikFilters = goliveSubTematikMultiSelect.getSelected();
-  const bulanFilters = goliveBulanMultiSelect.getSelected();
-  const dateFromRaw = document.getElementById('goliveDateFrom').value; // format "YYYY-MM-DD" bawaan <input type="date">
-  const dateToRaw = document.getElementById('goliveDateTo').value;
-  const dateFrom = dateFromRaw ? new Date(dateFromRaw + 'T00:00:00') : null;
-  const dateTo = dateToRaw ? new Date(dateToRaw + 'T23:59:59') : null;
-
-  const filtered = goliveRows.filter(row=>{
-    if(branchFilters.length && !branchFilters.includes(goliveGet(row,'branch'))) return false;
-    if(tematikFilters.length && !tematikFilters.includes(goliveGet(row,'tematik'))) return false;
-    if(subTematikFilters.length && !subTematikFilters.includes(goliveGet(row,'subTematik'))) return false;
-    if(bulanFilters.length && !bulanFilters.includes(goliveGet(row,'bulan'))) return false;
-    if(dateFrom || dateTo){
-      const d = parseDMY(goliveGet(row,'tglGolive'));
-      if(!d) return false;
-      if(dateFrom && d < dateFrom) return false;
-      if(dateTo && d > dateTo) return false;
-    }
-    if(q){
-      const hay = [goliveGet(row,'namaLop'), goliveGet(row,'sto'), goliveGet(row,'namaOdc'), goliveGet(row,'namaOdp')].join(' ').toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
-    return true;
-  });
-
-  // Urut berdasarkan tanggal golive (default: terbaru -> terlama). Baris tanpa tanggal valid ditaruh di akhir.
-  filtered.sort((a,b)=>{
-    const da = parseDMY(goliveGet(a,'tglGolive'));
-    const db = parseDMY(goliveGet(b,'tglGolive'));
-    if(!da && !db) return 0;
-    if(!da) return 1;
-    if(!db) return -1;
-    return goliveSortDir === 'desc' ? (db - da) : (da - db);
-  });
-
-  return filtered;
-}
-
-function goliveRenderTable(){
-  const body = document.getElementById('goliveTableBody');
-  const countEl = document.getElementById('goliveResultCount');
-  if(!body) return;
-
-  const filtered = goliveGetFilteredRows();
-  const shown = filtered.slice(0, 100);
-  if(countEl) countEl.textContent = `${filtered.length.toLocaleString('id-ID')} LoP${filtered.length > 100 ? ' (nampilin 100 pertama)' : ''}`;
-  body.innerHTML = shown.map(row => `
-    <tr>
-      <td>${goliveGet(row,'tglGolive')||'—'}</td>
-      <td>${goliveGet(row,'bulan')||'—'}</td>
-      <td class="name">${goliveGet(row,'namaLop')||'—'}</td>
-      <td>${goliveGet(row,'sto')||'—'}</td>
-      <td>${goliveGet(row,'branch')||'—'}</td>
-      <td>${goliveGet(row,'subTematik')||'—'}</td>
-      <td>${goliveGet(row,'tematik')||'—'}</td>
-      <td>${goliveGet(row,'namaOdc')||'—'}</td>
-      <td>${goliveGet(row,'namaOdp')||'—'}</td>
-    </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada data.</td></tr>`;
-}
-
-const goliveSortHeaderEl = document.getElementById('goliveSortTglGolive');
-if(goliveSortHeaderEl){
-  goliveSortHeaderEl.onclick = ()=>{
-    goliveSortDir = goliveSortDir === 'desc' ? 'asc' : 'desc';
-    goliveRenderTable();
-  };
-}
-
-async function goliveLoadDataAuto(){
-  let text = null;
-  for(const url of GOLIVE_CSV_URLS){
-    try{
-      const res = await universalFetch(url, {cache:'no-store'});
-      if(!res.ok) continue;
-      const t = await res.text();
-      if(t && t.trim().length > 0 && !t.trim().startsWith('<')){ text = t; break; }
-    }catch(e){ /* coba url berikutnya */ }
-  }
-  if(!text) return;
-  goliveProcessCSVText(text);
-  goliveSetupFilters();
-  goliveRenderTable();
-}
-
-document.getElementById('goliveDownloadBtn').onclick = ()=>{
-  downloadRowsAsCsv('golive-treg1-sumbagut.csv', [
-    {label:'Tanggal Golive', get:r=>goliveGet(r,'tglGolive')},
-    {label:'Bulan', get:r=>goliveGet(r,'bulan')},
-    {label:'Nama LOP', get:r=>goliveGet(r,'namaLop')},
-    {label:'STO', get:r=>goliveGet(r,'sto')},
-    {label:'Branch', get:r=>goliveGet(r,'branch')},
-    {label:'Sub Tematik', get:r=>goliveGet(r,'subTematik')},
-    {label:'Tematik', get:r=>goliveGet(r,'tematik')},
-    {label:'Nama ODC', get:r=>goliveGet(r,'namaOdc')},
-    {label:'Nama ODP', get:r=>goliveGet(r,'namaOdp')},
-  ], goliveGetFilteredRows());
-};
-
-goliveLoadDataAuto();
 
 hemLoadDataAuto();
 oloLoadDataAuto();
