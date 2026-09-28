@@ -367,7 +367,6 @@
     <button class="page-tab" id="tabBtnChecklist" type="button">☑️ Checklist</button>
     <button class="page-tab" id="tabBtnNeedOlt" type="button">🔧 Need Modul OLT</button>
     <button class="page-tab" id="tabBtnGolive" type="button">🟢 Golive</button>
-    <button class="page-tab" id="tabBtnWisa" type="button">🖼️ WISA</button>
   </div>
 
   <div id="pagePT2">
@@ -516,31 +515,6 @@
         <div class="pager" style="justify-content:flex-end;">
           <button class="download-lanjut-btn" id="downloadDropRedamanOdcBtn" type="button" style="width:auto;padding:9px 16px;border-top:none;border-radius:6px;">⬇ Download Excel (<span id="dropRedamanOdcCount">0</span>)</button>
         </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-head-row" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-        <div>
-          <p class="section-title">Klasifikasi AVG RXONU CEK (Kendala)</p>
-          <p class="section-desc">Sum of Port Actual, dikelompokkan berdasarkan range AVG RXONU CEK, khusus order STAT FINAL = Kendala. Diurut per Telkomsel Branch &amp; Jenis Program Cek.</p>
-        </div>
-        <button type="button" class="download-btn" id="rxonuKendalaFeedingDownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-      </div>
-      <div class="table-card" style="margin-top:14px;overflow-x:auto;">
-        <table class="pivot-table">
-          <thead>
-            <tr>
-              <th>Branch</th>
-              <th>Jenis Program Cek</th>
-              <th>-19 s/d -20</th>
-              <th>-20 s/d -22</th>
-              <th>&lt;-22</th>
-              <th>Grand Total</th>
-            </tr>
-          </thead>
-          <tbody id="rxonuKendalaTableBody"></tbody>
-        </table>
       </div>
     </div>
 
@@ -904,7 +878,7 @@
                   <th class="sortable" data-field="progress">Progress Lapangan<span class="sort-arrow">▲▼</span></th>
                   <th class="sortable" data-field="tanggal">Tanggal Order<span class="sort-arrow">▲▼</span></th>
                   <th class="sortable" data-field="detailprogres">Detail Progres<span class="sort-arrow">▲▼</span></th>
-                  <th class="sortable" data-field="komitmengl">Komitmen Golive<span class="sort-arrow">▲▼</span></th>
+                  <th class="sortable" data-field="komitmengl">New Komitmen GL<span class="sort-arrow">▲▼</span></th>
                 </tr>
               </thead>
               <tbody id="oloStageDetailBody"></tbody>
@@ -1024,7 +998,7 @@
                 <th class="sortable" data-field="Panjang Kabel (m)" data-numeric="true">Panjang Kabel (m)<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="NDE WORK ORDER KE TA">NDE Work Order<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="TANGGAL ORDER">Tanggal Order<span class="sort-arrow">▲▼</span></th>
-                <th class="sortable" data-field="Komitmen Golive">Komitmen Golive<span class="sort-arrow">▲▼</span></th>
+                <th class="sortable" data-field="NEW KOMITMEN GL">New Komitmen GL<span class="sort-arrow">▲▼</span></th>
                 <th>Detail Progres</th>
                 <th>Status PT1</th>
                 <th class="sortable" data-field="TTD" data-numeric="true">TTD<span class="sort-arrow">▲▼</span></th>
@@ -1260,9 +1234,6 @@
             <select id="pt3MtdYear" class="period-select"></select>
           </div>
           <span class="kpi-sub capture-hide" style="margin:0;">Filter MTD berdasarkan kolom "Tgl Order".</span>
-          <select id="pt3BranchPageFilter" class="period-select capture-hide" style="margin-left:8px;">
-            <option value="">Semua Branch</option>
-          </select>
           <button type="button" class="capture-hide ppt-capture-btn" id="pt3PptCaptureBtn" title="Capture untuk PPT">📷</button>
         </div>
       </div>
@@ -1337,9 +1308,9 @@
             <button type="button" class="ppt-capture-btn capture-hide" id="pt3KomitmenCaptureBtn" title="Capture Komitmen + Tren untuk broadcast">📷</button>
           </div>
         </div>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="pivot-table">
-            <thead><tr id="pt3CommitPivotHead"></tr></thead>
+        <div class="table-card">
+          <table class="mbb-report-table">
+            <thead><tr><th>Status</th><th>Total</th></tr></thead>
             <tbody id="pt3CommitTableBody"></tbody>
           </table>
         </div>
@@ -1347,20 +1318,6 @@
         <p class="section-title" style="font-size:14px;margin-top:18px;" id="pt3KomitmenTrendTitle">Tren Harian Komitmen Golive</p>
         <div class="table-card trend-chart-card">
           <div style="height:280px;"><canvas id="pt3KomitmenTrendChart"></canvas></div>
-        </div>
-
-        <p class="section-title" style="font-size:13px;margin-top:14px;">Resume Overdue — Komitmen Golive Terlewat <span class="kpi-sub" id="pt3OverdueCount" style="font-weight:500;"></span></p>
-        <p class="section-desc">Order yang tanggal Komitmen Golive-nya udah lewat hari ini, tapi belum Golive/Uji Terima/Rekon.</p>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Branch</th><th>STO</th><th>Nama LOP</th><th>Status</th>
-                <th>Komitmen Golive</th><th>Telat (hari)</th><th>Detail Status</th>
-              </tr>
-            </thead>
-            <tbody id="pt3OverdueTableBody"></tbody>
-          </table>
         </div>
         </div>
 
@@ -1425,7 +1382,6 @@
                 <th class="sortable" data-field="Tgl Order">Tgl Order<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="Status">Status<span class="sort-arrow">▲▼</span></th>
                 <th>Sub Status</th>
-                <th>Detail Status</th>
                 <th class="sortable" data-field="PORT PLAN" data-numeric="true">Port Plan<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="BOQ" data-numeric="true">BOQ<span class="sort-arrow">▲▼</span></th>
                 <th class="sortable" data-field="CPP" data-numeric="true">CPP<span class="sort-arrow">▲▼</span></th>
@@ -1464,9 +1420,6 @@
       <div class="section" style="margin-top:0;padding-bottom:0;">
         <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
           <span class="kpi-sub" style="margin:0;">Data PT3 UNDER FH (tidak ada filter periode — sheet ini tidak punya kolom tanggal order).</span>
-          <select id="pt3fhBranchPageFilter" class="period-select capture-hide" style="margin-left:8px;">
-            <option value="">Semua Branch</option>
-          </select>
           <button type="button" class="capture-hide ppt-capture-btn" id="pt3fhPptCaptureBtn" title="Capture untuk PPT">📷</button>
         </div>
       </div>
@@ -1533,9 +1486,9 @@
             <button type="button" class="ppt-capture-btn capture-hide" id="pt3fhKomitmenCaptureBtn" title="Capture Komitmen + Tren untuk broadcast">📷</button>
           </div>
         </div>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="pivot-table">
-            <thead><tr id="pt3fhCommitPivotHead"></tr></thead>
+        <div class="table-card">
+          <table class="mbb-report-table">
+            <thead><tr><th>Status</th><th>Total</th></tr></thead>
             <tbody id="pt3fhCommitTableBody"></tbody>
           </table>
         </div>
@@ -1543,20 +1496,6 @@
         <p class="section-title" style="font-size:14px;margin-top:18px;" id="pt3fhKomitmenTrendTitle">Tren Harian Komitmen Golive</p>
         <div class="table-card trend-chart-card">
           <div style="height:280px;"><canvas id="pt3fhKomitmenTrendChart"></canvas></div>
-        </div>
-
-        <p class="section-title" style="font-size:13px;margin-top:14px;">Resume Overdue — Komitmen Golive Terlewat <span class="kpi-sub" id="pt3fhOverdueCount" style="font-weight:500;"></span></p>
-        <p class="section-desc">Order yang tanggal Komitmen Golive-nya udah lewat hari ini, tapi belum Golive/Uji Terima/Rekon.</p>
-        <div class="table-card" style="overflow-x:auto;">
-          <table class="mbb-report-table">
-            <thead>
-              <tr>
-                <th>ID</th><th>Branch</th><th>STO</th><th>Nama LOP</th><th>Status</th>
-                <th>Komitmen Golive</th><th>Telat (hari)</th><th>Detail Status</th>
-              </tr>
-            </thead>
-            <tbody id="pt3fhOverdueTableBody"></tbody>
-          </table>
         </div>
         </div>
 
@@ -1787,31 +1726,6 @@
             <div class="val" id="lapPt2RunRateHist">—</div>
             <div class="kpi-sub">port/hari (30 hari terakhir)</div>
           </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-head-row" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-          <div>
-            <p class="section-title">Klasifikasi AVG RXONU CEK (Kendala)</p>
-            <p class="section-desc">Sum of Port Actual, dikelompokkan berdasarkan range AVG RXONU CEK, khusus order STAT FINAL = Kendala. Diurut per Telkomsel Branch &amp; Jenis Program Cek.</p>
-          </div>
-          <button type="button" class="download-btn" id="rxonuKendalaLapPt2DownloadBtn" style="margin-top:0;">📥 Download CSV</button>
-        </div>
-        <div class="table-card" style="margin-top:14px;overflow-x:auto;">
-          <table class="pivot-table">
-            <thead>
-              <tr>
-                <th>Branch</th>
-                <th>Jenis Program Cek</th>
-                <th>-19 s/d -20</th>
-                <th>-20 s/d -22</th>
-                <th>&lt;-22</th>
-                <th>Grand Total</th>
-              </tr>
-            </thead>
-            <tbody id="rxonuKendalaLapPt2TableBody"></tbody>
-          </table>
         </div>
       </div>
 
@@ -2144,7 +2058,7 @@
             <thead>
               <tr>
                 <th>IHLD</th><th>No Order</th><th>Nama Proyek</th><th>District</th><th>STO</th>
-                <th>Tanggal Order</th><th>Progres Lapangan</th><th>Komitmen Golive</th><th>Sub Status</th>
+                <th>Tanggal Order</th><th>Progres Lapangan</th><th>New Komitmen GL</th><th>Sub Status</th>
               </tr>
             </thead>
             <tbody id="oloNeedOltTableBody"></tbody>
@@ -2241,29 +2155,6 @@
             <tbody id="goliveTableBody"></tbody>
           </table>
         </div>
-      </div>
-    </div>
-
-    </div>
-
-    <div id="pageWisa" style="display:none;">
-
-    <div class="section" style="margin-top:0;">
-      <p class="section-title" style="margin-bottom:2px;">WISA</p>
-      <p class="section-desc" style="margin:0 0 16px;">Upload foto, otomatis tersimpan &amp; tampil buat semua orang yang buka dashboard ini.</p>
-
-      <div class="table-card" style="padding:20px;max-width:640px;">
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <input type="file" id="wisaFileInput" accept="image/*" style="flex:1;min-width:200px;">
-          <button type="button" class="download-btn" id="wisaUploadBtn" style="margin-top:0;">📤 Upload</button>
-        </div>
-        <p class="kpi-sub" id="wisaUploadStatus" style="margin:10px 0 0;"></p>
-      </div>
-
-      <div class="table-card" style="padding:20px;margin-top:16px;max-width:640px;text-align:center;">
-        <p class="kpi-sub" id="wisaPhotoMeta" style="margin:0 0 12px;"></p>
-        <img id="wisaPhotoImg" src="" alt="Foto WISA" style="max-width:100%;border-radius:10px;display:none;">
-        <p class="kpi-sub" id="wisaEmptyState" style="margin:0;">Belum ada foto yang di-upload.</p>
       </div>
     </div>
 
@@ -3312,95 +3203,6 @@ function setupMetricToggle(){
 
 function val(obj){ return currentMetric === 'port' ? (obj?.port||0) : (obj?.count||0); }
 
-const rxonuKendalaPivotData = {}; // keyed by tbodyId, buat kebutuhan download CSV
-
-function renderRxonuKendalaTable(tbodyId){
-  const tbody = document.getElementById(tbodyId);
-  if(!tbody) return;
-
-  const buckets = ['-19 s/d -20', '-20 s/d -22', '<-22'];
-  function classifyRxonu(raw){
-    const v = parseFloat((raw||'').toString().replace(',','.'));
-    if(isNaN(v)) return null;
-    if(v <= -19 && v >= -20) return '-19 s/d -20';
-    if(v < -20 && v >= -22) return '-20 s/d -22';
-    if(v < -22) return '<-22';
-    return null; // di luar 3 range ini (misal lebih bagus dari -19), gak masuk kategori manapun
-  }
-
-  // Struktur: { branch: { rows: { jenisProgramCek: {bucket: totalPort} }, total: {bucket: totalPort} } }
-  const data = {};
-  const branchOrder = [];
-  rows.forEach(row=>{
-    const statFinal = (get(row,'STAT FINAL')||'').toLowerCase();
-    if(!statFinal.includes('kendala')) return;
-
-    const bucket = classifyRxonu(get(row,'AVG RXONU CEK'));
-    if(!bucket) return;
-
-    const branch = get(row,'Telkomsel Branch') || 'Tidak Diketahui';
-    const jenisProgramCek = get(row,'JENIS PROGRAM CEK') || get(row,'JENIS PROGRAM') || 'Tidak Diketahui';
-    const port = parseNum(get(row,'PORT ACTUAL'));
-
-    if(!data[branch]){ data[branch] = { rows:{}, total:{} }; branchOrder.push(branch); }
-    if(!data[branch].rows[jenisProgramCek]) data[branch].rows[jenisProgramCek] = {};
-    data[branch].rows[jenisProgramCek][bucket] = (data[branch].rows[jenisProgramCek][bucket]||0) + port;
-    data[branch].total[bucket] = (data[branch].total[bucket]||0) + port;
-  });
-
-  branchOrder.sort();
-
-  const grandTotal = {};
-  const flatRows = []; // buat download CSV — 1 baris per Branch+Jenis, plus subtotal & grand total
-  let html = '';
-  branchOrder.forEach(branch=>{
-    const b = data[branch];
-    const jenisOrders = Object.keys(b.rows).sort();
-    jenisOrders.forEach(jo=>{
-      const vals = b.rows[jo];
-      const rowTotal = buckets.reduce((s,bk)=> s + (vals[bk]||0), 0);
-      html += `<tr>
-        <td class="name">${branch}</td>
-        <td>${jo}</td>
-        ${buckets.map(bk=> `<td>${vals[bk] ? vals[bk].toLocaleString('id-ID') : '—'}</td>`).join('')}
-        <td>${rowTotal.toLocaleString('id-ID')}</td>
-      </tr>`;
-      flatRows.push({ branch, jenis: jo, b1: vals[buckets[0]]||0, b2: vals[buckets[1]]||0, b3: vals[buckets[2]]||0, total: rowTotal });
-    });
-    const branchTotal = buckets.reduce((s,bk)=> s + (b.total[bk]||0), 0);
-    buckets.forEach(bk=>{ grandTotal[bk] = (grandTotal[bk]||0) + (b.total[bk]||0); });
-    html += `<tr class="pivot-total">
-      <td class="name" colspan="2">${branch} (Subtotal)</td>
-      ${buckets.map(bk=> `<td>${(b.total[bk]||0).toLocaleString('id-ID')}</td>`).join('')}
-      <td>${branchTotal.toLocaleString('id-ID')}</td>
-    </tr>`;
-    flatRows.push({ branch: branch + ' (Subtotal)', jenis: '', b1: b.total[buckets[0]]||0, b2: b.total[buckets[1]]||0, b3: b.total[buckets[2]]||0, total: branchTotal });
-  });
-
-  const grandTotalSum = buckets.reduce((s,bk)=> s + (grandTotal[bk]||0), 0);
-  html += `<tr class="pivot-total">
-    <td class="name" colspan="2">GRAND TOTAL</td>
-    ${buckets.map(bk=> `<td>${(grandTotal[bk]||0).toLocaleString('id-ID')}</td>`).join('')}
-    <td>${grandTotalSum.toLocaleString('id-ID')}</td>
-  </tr>`;
-  flatRows.push({ branch:'GRAND TOTAL', jenis:'', b1: grandTotal[buckets[0]]||0, b2: grandTotal[buckets[1]]||0, b3: grandTotal[buckets[2]]||0, total: grandTotalSum });
-
-  rxonuKendalaPivotData[tbodyId] = flatRows;
-  tbody.innerHTML = html || `<tr><td colspan="6" style="text-align:center;padding:24px;">Tidak ada data kendala.</td></tr>`;
-}
-
-function downloadRxonuKendala(tbodyId, filename){
-  const data = rxonuKendalaPivotData[tbodyId] || [];
-  downloadRowsAsCsv(filename, [
-    {label:'Branch', get:r=>r.branch},
-    {label:'Jenis Program Cek', get:r=>r.jenis},
-    {label:'-19 s/d -20', get:r=>r.b1},
-    {label:'-20 s/d -22', get:r=>r.b2},
-    {label:'<-22', get:r=>r.b3},
-    {label:'Grand Total', get:r=>r.total},
-  ], data);
-}
-
 function renderAllMetricViews(){
   if(!AGG) return;
   renderFunnelCharts();
@@ -3410,8 +3212,6 @@ function renderAllMetricViews(){
   renderBranchChart(AGG.branchAgg);
   renderKetDropSection(AGG.ketDropAgg);
   renderDropRedamanSection(AGG.dropRedamanAgg);
-  renderRxonuKendalaTable('rxonuKendalaTableBody');
-  renderRxonuKendalaTable('rxonuKendalaLapPt2TableBody');
 
   if(GOLONG_OCC && Object.keys(GOLONG_OCC).length){
     renderTrendFromGolongOcc();
@@ -4541,66 +4341,6 @@ function renderOgpBreakdownDonut(canvasId, ogpRows, labelFn, maxSlices, filterCt
 }
 
 const _komitmenTrendCharts = {};
-/**
- * Tabel resume "Overdue" — order yang KOMITMEN GOLIVE-nya udah lewat hari ini
- * tapi belum Golive/Uji Terima/Rekon (kategori masih 'ogp'). Dipakai bareng
- * PT3 TA & PT3 FH (field-nya sama persis: ID-IHLD, BRANCH FMC, dst).
- */
-/* Ringkas teks "DETAIL STATUS" yang biasanya berupa log panjang — ambil
-   entry/baris TERAKHIR aja (asumsi update terbaru ditulis di akhir),
-   dipotong lagi kalau masih kepanjangan. Dipakai di tabel Resume Overdue
-   biar ringkas, teks lengkapnya tetap ada di tooltip (title attribute). */
-function ringkasDetailStatus(text){
-  if(!text) return '—';
-  const parts = text.toString().split(/[\n\r]+/).map(s=>s.trim()).filter(Boolean);
-  let ringkas = parts.length ? parts[parts.length-1] : text.toString().trim();
-  const MAX = 55;
-  if(ringkas.length > MAX) ringkas = ringkas.slice(0, MAX) + '…';
-  return ringkas || '—';
-}
-
-function renderOverdueTable(tbodyId, countId, rows, getFn, categoryFn){
-  const tbody = document.getElementById(tbodyId);
-  const countEl = document.getElementById(countId);
-  if(!tbody) return;
-
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  const overdue = rows.filter(row=>{
-    const d = parseDMY(getFn(row,'KOMITMEN GOLIVE'));
-    if(!d) return false;
-    d.setHours(0,0,0,0);
-    if(d >= today) return false; // belum lewat tanggal, bukan overdue
-    return categoryFn(row) === 'ogp'; // masih pending, bukan golive/drop
-  });
-
-  overdue.sort((a,b)=>{
-    const da = parseDMY(getFn(a,'KOMITMEN GOLIVE'));
-    const db = parseDMY(getFn(b,'KOMITMEN GOLIVE'));
-    return da - db; // yang paling lama telat ditaruh paling atas
-  });
-
-  if(countEl) countEl.textContent = `(${overdue.length.toLocaleString('id-ID')} order)`;
-
-  tbody.innerHTML = overdue.map(row=>{
-    const d = parseDMY(getFn(row,'KOMITMEN GOLIVE'));
-    d.setHours(0,0,0,0);
-    const daysLate = Math.round((today - d) / (1000*60*60*24));
-    const detailFull = (getFn(row,'DETAIL STATUS')||'').toString().replace(/"/g,'&quot;');
-    return `<tr>
-      <td>${getFn(row,'ID-IHLD')||'—'}</td>
-      <td>${getFn(row,'BRANCH FMC')||'—'}</td>
-      <td>${getFn(row,'STO')||'—'}</td>
-      <td class="name">${getFn(row,'NAMA LOP')||'—'}</td>
-      <td>${getFn(row,'Status')||'—'}</td>
-      <td>${getFn(row,'KOMITMEN GOLIVE')||'—'}</td>
-      <td>${daysLate}</td>
-      <td style="font-size:11.5px;color:var(--text-dim);" title="${detailFull}">${ringkasDetailStatus(getFn(row,'DETAIL STATUS'))}</td>
-    </tr>`;
-  }).join('') || `<tr><td colspan="8" style="text-align:center;padding:20px;">🎉 Tidak ada order overdue.</td></tr>`;
-}
-
 function renderKomitmenTrendChart(canvasId, summaryId, rows, getFn, commitField, categoryFn, filterCtl, titleId){
   const canvas = document.getElementById(canvasId);
   if(!canvas) return;
@@ -5325,7 +5065,7 @@ function oloBuildDashboard(){
   oloRenderTable();
   oloHideStageDetail();
   oloSetupCommitDropdown();
-  renderKomitmenTrendChart('oloKomitmenTrendChart', null, oloAGG.rows, oloGet, 'Komitmen Golive', (row)=> hemCategoryOfLabel(oloRowProgressLabel(row)), oloFilterCtl, 'oloKomitmenTrendTitle');
+  renderKomitmenTrendChart('oloKomitmenTrendChart', null, oloAGG.rows, oloGet, 'NEW KOMITMEN GL', (row)=> hemCategoryOfLabel(oloRowProgressLabel(row)), oloFilterCtl, 'oloKomitmenTrendTitle');
   renderKomitmenGLPage();
   renderOloChecklistPage();
   renderOloNeedOltPage();
@@ -5336,7 +5076,7 @@ function oloRenderCommitTable(){
   const body = document.getElementById('oloCommitTableBody');
   if(!body || !oloAGG) return;
   const matching = oloAGG.rows.filter(row=>{
-    const d = parseDMY(oloGet(row,'Komitmen Golive'));
+    const d = parseDMY(oloGet(row,'NEW KOMITMEN GL'));
     return d && d.getFullYear() === new Date().getFullYear() && d.getMonth() === oloCommitMonth;
   });
   const statusAgg = {};
@@ -5418,7 +5158,7 @@ const oloStageDetail = makeStageDetailController('olo', [
   { field:'progress', get: r => oloGet(r,'Progress Lapangan') },
   { field:'tanggal', get: r => oloGet(r,'TANGGAL ORDER') },
   { field:'detailprogres', get: r => oloGet(r,'Detail Progres') },
-  { field:'komitmengl', get: r => oloGet(r,'Komitmen Golive') },
+  { field:'komitmengl', get: r => oloGet(r,'NEW KOMITMEN GL') },
 ]);
 
 function oloShowStageDetail(title, matchingRows, activeEl, siblingSelector){
@@ -5683,7 +5423,7 @@ function oloRenderTable(){
       <td>${oloGet(row,'Panjang Kabel (m)')||'—'}</td>
       <td>${oloGet(row,'NDE WORK ORDER KE TA')||'—'}</td>
       <td>${oloGet(row,'TANGGAL ORDER')||'—'}</td>
-      <td>${oloGet(row,'Komitmen Golive')||'—'}</td>
+      <td>${oloGet(row,'NEW KOMITMEN GL')||'—'}</td>
       <td>${hemFormatDetailProgres(detailProgres)}</td>
       <td>${renderStatusPT1Cell('olo', ihld, getByColLetter(row,'S'))}</td>
       <td>${oloGet(row,'TTD')||'—'}</td>
@@ -5710,7 +5450,7 @@ document.getElementById('oloNextPage').onclick = ()=>{ oloCurrentPage++; oloRend
 
 /* ---------- Tab switching (3 tab) ---------- */
 function switchTab(active){
-  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'], needOlt:['tabBtnNeedOlt','pageNeedOlt'], golive:['tabBtnGolive','pageGolive'], wisa:['tabBtnWisa','pageWisa'] };
+  const tabs = { pt2:['tabBtnPT2','pagePT2'], hem:['tabBtnHem','pageHem'], olo:['tabBtnOlo','pageOlo'], mbb:['tabBtnMbb','pageMbb'], pt3:['tabBtnPt3','pagePt3'], pt3fh:['tabBtnPt3Fh','pagePt3Fh'], qeRelok:['tabBtnQeRelok','pageQeRelok'], lapPt2:['tabBtnLapPt2','pageLapPt2'], komitmenGL:['tabBtnKomitmenGL','pageKomitmenGL'], checklist:['tabBtnChecklist','pageChecklist'], needOlt:['tabBtnNeedOlt','pageNeedOlt'], golive:['tabBtnGolive','pageGolive'] };
   Object.keys(tabs).forEach(key=>{
     const [btnId, pageId] = tabs[key];
     const isActive = key === active;
@@ -5730,7 +5470,6 @@ document.getElementById('tabBtnKomitmenGL').onclick = ()=> switchTab('komitmenGL
 document.getElementById('tabBtnChecklist').onclick = ()=> switchTab('checklist');
 document.getElementById('tabBtnNeedOlt').onclick = ()=> switchTab('needOlt');
 document.getElementById('tabBtnGolive').onclick = ()=> switchTab('golive');
-document.getElementById('tabBtnWisa').onclick = ()=> { switchTab('wisa'); wisaLoadPhoto(); };
 
 const hemStageDetailCloseBtn = document.getElementById('hemStageDetailCloseBtn');
 if(hemStageDetailCloseBtn) hemStageDetailCloseBtn.onclick = hemHideStageDetail;
@@ -6710,7 +6449,6 @@ mbbLoadDataAuto();
 let pt3Rows = [];
 let pt3HeaderMap = {};
 let pt3AGG = null;
-let pt3BranchPageFilter = ''; // '' = semua branch; kalau diisi, filter SELURUH halaman (KPI/chart/pivot/tabel)
 let pt3CurrentPage = 1;
 let pt3SortField = null;
 let pt3SortDir = 'asc';
@@ -6816,37 +6554,14 @@ async function pt3LoadDataAuto(){
 }
 
 function pt3GetPeriodRows(){
-  let baseRows;
   if(pt3PeriodMode === 'mtd'){
-    baseRows = pt3Rows.filter(row=>{
+    return pt3Rows.filter(row=>{
       const d = parseDMY(pt3Get(row,'Tgl Order'));
       if(!d) return false;
       return d.getFullYear() === pt3MtdYear && d.getMonth() === pt3MtdMonth;
     });
-  } else {
-    baseRows = pt3Rows;
   }
-  if(pt3BranchPageFilter){
-    baseRows = baseRows.filter(row => (pt3Get(row,'BRANCH FMC')||'Tidak Diketahui') === pt3BranchPageFilter);
-  }
-  return baseRows;
-}
-
-function pt3SetupBranchPageFilter(){
-  const sel = document.getElementById('pt3BranchPageFilter');
-  if(!sel) return;
-  if(sel.dataset.wired) return; // cuma isi opsi & wire sekali
-  sel.dataset.wired = '1';
-  const branches = [...new Set(pt3Rows.map(r => pt3Get(r,'BRANCH FMC') || 'Tidak Diketahui'))].sort();
-  branches.forEach(b=>{
-    const opt = document.createElement('option');
-    opt.value = b; opt.textContent = b;
-    sel.appendChild(opt);
-  });
-  sel.onchange = ()=>{
-    pt3BranchPageFilter = sel.value;
-    pt3BuildDashboard();
-  };
+  return pt3Rows;
 }
 
 function pt3SetupPeriodFilter(){
@@ -6894,7 +6609,6 @@ function pt3SetupPeriodFilter(){
 
 function pt3BuildDashboard(){
   pt3SetupPeriodFilter();
-  pt3SetupBranchPageFilter();
   const baseRows = pt3GetPeriodRows();
 
   const statusAgg = {};
@@ -6929,7 +6643,6 @@ function pt3BuildDashboard(){
   pt3RenderTable();
   pt3HideStageDetail();
   renderKomitmenTrendChart('pt3KomitmenTrendChart', null, pt3AGG.rows, pt3Get, 'KOMITMEN GOLIVE', (row)=> pt3Category(row), pt3FilterCtl, 'pt3KomitmenTrendTitle');
-  renderOverdueTable('pt3OverdueTableBody', 'pt3OverdueCount', pt3AGG.rows, pt3Get, pt3Category);
   renderKomitmenGLPage();
   renderPt3NeedOltPage();
 }
@@ -7040,18 +6753,13 @@ function pt3RenderPivotBranch(){
     return;
   }
 
-  headEl.innerHTML = `<th class="pivot-sticky-col">Branch</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total</th><th>% Achievement</th>`;
+  headEl.innerHTML = `<th class="pivot-sticky-col">Branch</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total</th>`;
 
-  const achievementStages = ['GOLIVE', 'UJI TERIMA', 'REKON'];
   const colTotals = Object.fromEntries(columns.map(c=>[c,0]));
   let grandTotal = 0;
-  let grandAchievement = 0;
   bodyEl.innerHTML = branches.map(b=>{
     const rowTotal = branchTotals[b] || 0;
     grandTotal += rowTotal;
-    const achievementSum = achievementStages.reduce((s,st)=> s + (pivot[b][st]||0), 0);
-    grandAchievement += achievementSum;
-    const achievementPct = rowTotal ? (achievementSum/rowTotal*100) : 0;
     const cells = columns.map(c=>{
       const v = (pivot[b][c]||0);
       colTotals[c] += v;
@@ -7059,15 +6767,13 @@ function pt3RenderPivotBranch(){
       const clickable = v ? `clickable-cell" data-flt="${spec}` : '';
       return `<td class="${clickable}">${v ? v.toLocaleString('id-ID') : '—'}</td>`;
     }).join('');
-    return `<tr><td class="name pivot-sticky-col">${b}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td><td>${achievementPct.toFixed(1)}%</td></tr>`;
+    return `<tr><td class="name pivot-sticky-col">${b}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td></tr>`;
   }).join('') + `
     <tr class="pivot-total">
       <td class="name pivot-sticky-col">TOTAL</td>
       ${columns.map(c=>`<td>${colTotals[c].toLocaleString('id-ID')}</td>`).join('')}
       <td>${grandTotal.toLocaleString('id-ID')}</td>
-      <td>${(grandTotal ? (grandAchievement/grandTotal*100) : 0).toFixed(1)}%</td>
     </tr>`;
-
 
   wireClickableCells('pt3PivotBranchBody', pt3FilterCtl, (spec)=>{
     return row => (pt3Get(row,'BRANCH FMC')||'Tidak Diketahui') === spec.branch
@@ -7511,71 +7217,33 @@ function pt3RenderAllOrderReport(){
 
 function pt3RenderCommitTable(){
 
-  const headEl = document.getElementById('pt3CommitPivotHead');
   const body = document.getElementById('pt3CommitTableBody');
-  if(!body || !headEl || !pt3AGG) return;
+  if(!body || !pt3AGG) return;
   const matching = pt3AGG.rows.filter(row=>{
     const d = parseDMY(pt3Get(row,'KOMITMEN GOLIVE'));
     return d && d.getFullYear() === new Date().getFullYear() && d.getMonth() === pt3CommitMonth;
   });
-
-  const stagesPresent = new Set();
-  matching.forEach(r => stagesPresent.add(hemStripStatusPrefix(pt3RowStatusLabel(r)).toUpperCase()));
-  const columns = [...stagesPresent].sort((a,b)=> pt3StageOrderIndex(a) - pt3StageOrderIndex(b));
-
-  const pivot = {}; // { branch: { status: totalPort } }
-  const branchTotals = {};
-  const branchOrder = [];
+  const statusAgg = {};
+  let totalPort = 0;
   matching.forEach(row=>{
-    const branch = pt3Get(row,'BRANCH FMC') || 'Tidak Diketahui';
     const label = hemStripStatusPrefix(pt3RowStatusLabel(row)).toUpperCase();
     const port = pt3ParseNum(pt3Get(row,'PORT PLAN'));
-    if(!pivot[branch]){ pivot[branch] = {}; branchOrder.push(branch); }
-    pivot[branch][label] = (pivot[branch][label]||0) + port;
-    branchTotals[branch] = (branchTotals[branch]||0) + port;
+    statusAgg[label] = (statusAgg[label]||0) + port;
+    totalPort += port;
   });
-  branchOrder.sort();
-
-  if(branchOrder.length === 0 || columns.length === 0){
-    headEl.innerHTML = `<th>Branch FMC</th><th>Total Port</th>`;
-    body.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:10px;">Tidak ada komitmen di bulan ini.</td></tr>`;
-    return;
-  }
-
-  headEl.innerHTML = `<th class="pivot-sticky-col">Branch FMC</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total Port</th><th>% Achievement</th>`;
-
-  const achievementStages = ['GOLIVE', 'UJI TERIMA', 'REKON'];
-  const colTotals = Object.fromEntries(columns.map(c=>[c,0]));
-  let grandTotal = 0;
-  let grandAchievement = 0;
-  body.innerHTML = branchOrder.map(branch=>{
-    const rowTotal = branchTotals[branch] || 0;
-    grandTotal += rowTotal;
-    const achievementSum = achievementStages.reduce((s,st)=> s + (pivot[branch][st]||0), 0);
-    grandAchievement += achievementSum;
-    const achievementPct = rowTotal ? (achievementSum/rowTotal*100) : 0;
-    const cells = columns.map(c=>{
-      const v = pivot[branch][c]||0;
-      colTotals[c] += v;
-      const spec = JSON.stringify({month:pt3CommitMonth, branch, status:c, label:`Komitmen Golive — ${branch} — ${c}`}).replace(/"/g,'&quot;');
-      const clickable = v ? `clickable-cell" data-flt="${spec}` : '';
-      return `<td class="${clickable}">${v ? v.toLocaleString('id-ID') : '—'}</td>`;
-    }).join('');
-    return `<tr><td class="name pivot-sticky-col">${branch}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td><td>${achievementPct.toFixed(1)}%</td></tr>`;
-  }).join('') + `
-    <tr class="total-row pivot-total">
-      <td class="name pivot-sticky-col">TOTAL</td>
-      ${columns.map(c=>`<td>${colTotals[c].toLocaleString('id-ID')}</td>`).join('')}
-      <td>${grandTotal.toLocaleString('id-ID')}</td>
-      <td>${(grandTotal ? (grandAchievement/grandTotal*100) : 0).toFixed(1)}%</td>
-    </tr>`;
+  const entries = Object.entries(statusAgg).sort((a,b)=> pt3StageOrderIndex(a[0]) - pt3StageOrderIndex(b[0]));
+  const totalSpec = JSON.stringify({month:pt3CommitMonth, status:null, label:`Komitmen Golive bulan ini — Semua Status`}).replace(/"/g,'&quot;');
+  body.innerHTML = (entries.map(([label,port])=>{
+      const spec = JSON.stringify({month:pt3CommitMonth, status:label, label:`Komitmen Golive — ${label}`}).replace(/"/g,'&quot;');
+      return `<tr><td class="name clickable-cell" data-flt="${spec}">${label}</td><td class="clickable-cell" data-flt="${spec}">${port.toLocaleString('id-ID')}</td></tr>`;
+    }).join('') || `<tr><td colspan="2" style="text-align:center;padding:10px;">Tidak ada komitmen di bulan ini.</td></tr>`)
+    + `<tr class="total-row"><td class="name clickable-cell" data-flt="${totalSpec}">TOTAL</td><td class="clickable-cell" data-flt="${totalSpec}">${totalPort.toLocaleString('id-ID')}</td></tr>`;
 
   if(!pt3CommitTableWired){
     wireClickableCells('pt3CommitTableBody', pt3FilterCtl, (spec)=>{
       return row=>{
         const d = parseDMY(pt3Get(row,'KOMITMEN GOLIVE'));
         if(!d || d.getFullYear() !== new Date().getFullYear() || d.getMonth() !== spec.month) return false;
-        if(spec.branch !== null && (pt3Get(row,'BRANCH FMC')||'Tidak Diketahui') !== spec.branch) return false;
         if(spec.status === null) return true;
         return hemStripStatusPrefix(pt3RowStatusLabel(row)).toUpperCase() === spec.status;
       };
@@ -7802,7 +7470,6 @@ function pt3RenderTable(){
       <td>${pt3Get(row,'Tgl Order')||'—'}</td>
       <td>${pt3Get(row,'Status')||'—'}</td>
       <td>${pt3Get(row,'SUB STATUS KONS')||'—'}</td>
-      <td style="max-width:260px;"><div style="max-height:48px;overflow-y:auto;white-space:normal;font-size:11.5px;color:var(--text-dim);line-height:1.4;" title="${(pt3Get(row,'DETAIL STATUS')||'').replace(/"/g,'&quot;')}">${pt3Get(row,'DETAIL STATUS')||'—'}</div></td>
       <td>${pt3Get(row,'PORT PLAN')||'—'}</td>
       <td>${fmtIDR(pt3ParseNum(pt3Get(row,'BOQ')))}</td>
       <td>${fmtIDR(pt3ParseNum(pt3Get(row,'CPP')))}</td>
@@ -7811,7 +7478,7 @@ function pt3RenderTable(){
       <td>${pt3Get(row,'WASPANG')||'—'}</td>
       <td>${pt3FormatUpdateDate(pt3Get(row,'DETAIL STATUS'))}</td>
       <td>${pt3FormatUpdateGap(pt3Get(row,'DETAIL STATUS'))}</td>
-    </tr>`).join('') || `<tr><td colspan="17" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
+    </tr>`).join('') || `<tr><td colspan="16" style="text-align:center;padding:30px;">Tidak ada data yang cocok.</td></tr>`;
 
   document.getElementById('pt3PageInfo').textContent = `Halaman ${pt3CurrentPage} dari ${totalPages}`;
   document.getElementById('pt3PrevPage').disabled = pt3CurrentPage <= 1;
@@ -8267,38 +7934,15 @@ async function pt3fhLoadDataAuto(){
 }
 
 /* PT3 FH tidak punya kolom "Tgl Order", jadi tidak ada filter YTD/MTD — selalu semua data. */
-let pt3fhBranchPageFilter = ''; // '' = semua branch; kalau diisi, filter SELURUH halaman (KPI/chart/pivot/tabel)
-
 function pt3fhGetPeriodRows(){
-  let baseRows = pt3fhRows;
-  if(pt3fhBranchPageFilter){
-    baseRows = baseRows.filter(row => (pt3fhGet(row,'BRANCH FMC')||'Tidak Diketahui') === pt3fhBranchPageFilter);
-  }
-  return baseRows;
+  return pt3fhRows;
 }
 function pt3fhSetupPeriodFilter(){
   /* no-op: sheet PT3 UNDER FH tidak punya kolom tanggal order buat filter periode */
 }
-function pt3fhSetupBranchPageFilter(){
-  const sel = document.getElementById('pt3fhBranchPageFilter');
-  if(!sel) return;
-  if(sel.dataset.wired) return; // cuma isi opsi & wire sekali
-  sel.dataset.wired = '1';
-  const branches = [...new Set(pt3fhRows.map(r => pt3fhGet(r,'BRANCH FMC') || 'Tidak Diketahui'))].sort();
-  branches.forEach(b=>{
-    const opt = document.createElement('option');
-    opt.value = b; opt.textContent = b;
-    sel.appendChild(opt);
-  });
-  sel.onchange = ()=>{
-    pt3fhBranchPageFilter = sel.value;
-    pt3fhBuildDashboard();
-  };
-}
 
 function pt3fhBuildDashboard(){
   pt3fhSetupPeriodFilter();
-  pt3fhSetupBranchPageFilter();
   const baseRows = pt3fhGetPeriodRows();
 
   const statusAgg = {};
@@ -8332,7 +7976,6 @@ function pt3fhBuildDashboard(){
   pt3fhRenderTable();
   pt3fhHideStageDetail();
   renderKomitmenTrendChart('pt3fhKomitmenTrendChart', null, pt3fhAGG.rows, pt3fhGet, 'KOMITMEN GOLIVE', (row)=> pt3fhCategory(row), pt3fhFilterCtl, 'pt3fhKomitmenTrendTitle');
-  renderOverdueTable('pt3fhOverdueTableBody', 'pt3fhOverdueCount', pt3fhAGG.rows, pt3fhGet, pt3fhCategory);
   renderKomitmenGLPage();
 }
 
@@ -8442,18 +8085,13 @@ function pt3fhRenderPivotBranch(){
     return;
   }
 
-  headEl.innerHTML = `<th class="pivot-sticky-col">Branch</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total</th><th>% Achievement</th>`;
+  headEl.innerHTML = `<th class="pivot-sticky-col">Branch</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total</th>`;
 
-  const achievementStages = ['GOLIVE', 'UJI TERIMA', 'REKON'];
   const colTotals = Object.fromEntries(columns.map(c=>[c,0]));
   let grandTotal = 0;
-  let grandAchievement = 0;
   bodyEl.innerHTML = branches.map(b=>{
     const rowTotal = branchTotals[b] || 0;
     grandTotal += rowTotal;
-    const achievementSum = achievementStages.reduce((s,st)=> s + (pivot[b][st]||0), 0);
-    grandAchievement += achievementSum;
-    const achievementPct = rowTotal ? (achievementSum/rowTotal*100) : 0;
     const cells = columns.map(c=>{
       const v = (pivot[b][c]||0);
       colTotals[c] += v;
@@ -8461,15 +8099,13 @@ function pt3fhRenderPivotBranch(){
       const clickable = v ? `clickable-cell" data-flt="${spec}` : '';
       return `<td class="${clickable}">${v ? v.toLocaleString('id-ID') : '—'}</td>`;
     }).join('');
-    return `<tr><td class="name pivot-sticky-col">${b}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td><td>${achievementPct.toFixed(1)}%</td></tr>`;
+    return `<tr><td class="name pivot-sticky-col">${b}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td></tr>`;
   }).join('') + `
     <tr class="pivot-total">
       <td class="name pivot-sticky-col">TOTAL</td>
       ${columns.map(c=>`<td>${colTotals[c].toLocaleString('id-ID')}</td>`).join('')}
       <td>${grandTotal.toLocaleString('id-ID')}</td>
-      <td>${(grandTotal ? (grandAchievement/grandTotal*100) : 0).toFixed(1)}%</td>
     </tr>`;
-
 
   wireClickableCells('pt3fhPivotBranchBody', pt3fhFilterCtl, (spec)=>{
     return row => (pt3fhGet(row,'BRANCH FMC')||'Tidak Diketahui') === spec.branch
@@ -8898,79 +8534,25 @@ function pt3fhRenderAllOrderReport(){
 
 function pt3fhRenderCommitTable(){
 
-  const headEl = document.getElementById('pt3fhCommitPivotHead');
   const body = document.getElementById('pt3fhCommitTableBody');
-  if(!body || !headEl || !pt3fhAGG) return;
+  if(!body || !pt3fhAGG) return;
   const matching = pt3fhAGG.rows.filter(row=>{
     const d = parseDMY(pt3fhGet(row,'KOMITMEN GOLIVE'));
     return d && d.getFullYear() === new Date().getFullYear() && d.getMonth() === pt3fhCommitMonth;
   });
-
-  const stagesPresent = new Set();
-  matching.forEach(r => stagesPresent.add(hemStripStatusPrefix(pt3fhRowStatusLabel(r)).toUpperCase()));
-  const columns = [...stagesPresent].sort((a,b)=> pt3fhStageOrderIndex(a) - pt3fhStageOrderIndex(b));
-
-  const pivot = {}; // { branch: { status: totalPort } }
-  const branchTotals = {};
-  const branchOrder = [];
+  const statusAgg = {};
+  let totalPort = 0;
   matching.forEach(row=>{
-    const branch = pt3fhGet(row,'BRANCH FMC') || 'Tidak Diketahui';
     const label = hemStripStatusPrefix(pt3fhRowStatusLabel(row)).toUpperCase();
     const port = pt3fhParseNum(pt3fhGet(row,'PORT PLAN'));
-    if(!pivot[branch]){ pivot[branch] = {}; branchOrder.push(branch); }
-    pivot[branch][label] = (pivot[branch][label]||0) + port;
-    branchTotals[branch] = (branchTotals[branch]||0) + port;
+    statusAgg[label] = (statusAgg[label]||0) + port;
+    totalPort += port;
   });
-  branchOrder.sort();
-
-  if(branchOrder.length === 0 || columns.length === 0){
-    headEl.innerHTML = `<th>Branch FMC</th><th>Total Port</th>`;
-    body.innerHTML = `<tr><td colspan="2" style="text-align:center;padding:10px;">Tidak ada komitmen di bulan ini.</td></tr>`;
-    return;
-  }
-
-  headEl.innerHTML = `<th class="pivot-sticky-col">Branch FMC</th>` + columns.map(c=>`<th>${c}</th>`).join('') + `<th>Total Port</th><th>% Achievement</th>`;
-
-  const achievementStages = ['GOLIVE', 'UJI TERIMA', 'REKON'];
-  const colTotals = Object.fromEntries(columns.map(c=>[c,0]));
-  let grandTotal = 0;
-  let grandAchievement = 0;
-  body.innerHTML = branchOrder.map(branch=>{
-    const rowTotal = branchTotals[branch] || 0;
-    grandTotal += rowTotal;
-    const achievementSum = achievementStages.reduce((s,st)=> s + (pivot[branch][st]||0), 0);
-    grandAchievement += achievementSum;
-    const achievementPct = rowTotal ? (achievementSum/rowTotal*100) : 0;
-    const cells = columns.map(c=>{
-      const v = pivot[branch][c]||0;
-      colTotals[c] += v;
-      const spec = JSON.stringify({month:pt3fhCommitMonth, branch, status:c, label:`Komitmen Golive — ${branch} — ${c}`}).replace(/"/g,'&quot;');
-      const clickable = v ? `clickable-cell" data-flt="${spec}` : '';
-      return `<td class="${clickable}">${v ? v.toLocaleString('id-ID') : '—'}</td>`;
-    }).join('');
-    return `<tr><td class="name pivot-sticky-col">${branch}</td>${cells}<td><strong>${rowTotal.toLocaleString('id-ID')}</strong></td><td>${achievementPct.toFixed(1)}%</td></tr>`;
-  }).join('') + `
-    <tr class="total-row pivot-total">
-      <td class="name pivot-sticky-col">TOTAL</td>
-      ${columns.map(c=>`<td>${colTotals[c].toLocaleString('id-ID')}</td>`).join('')}
-      <td>${grandTotal.toLocaleString('id-ID')}</td>
-      <td>${(grandTotal ? (grandAchievement/grandTotal*100) : 0).toFixed(1)}%</td>
-    </tr>`;
-
-  if(!pt3fhCommitTableWired){
-    wireClickableCells('pt3fhCommitTableBody', pt3fhFilterCtl, (spec)=>{
-      return row=>{
-        const d = parseDMY(pt3fhGet(row,'KOMITMEN GOLIVE'));
-        if(!d || d.getFullYear() !== new Date().getFullYear() || d.getMonth() !== spec.month) return false;
-        if(spec.branch !== null && (pt3fhGet(row,'BRANCH FMC')||'Tidak Diketahui') !== spec.branch) return false;
-        if(spec.status === null) return true;
-        return hemStripStatusPrefix(pt3fhRowStatusLabel(row)).toUpperCase() === spec.status;
-      };
-    });
-    pt3fhCommitTableWired = true;
-  }
+  const entries = Object.entries(statusAgg).sort((a,b)=> pt3fhStageOrderIndex(a[0]) - pt3fhStageOrderIndex(b[0]));
+  body.innerHTML = (entries.map(([label,port])=>`
+      <tr><td class="name">${label}</td><td>${port.toLocaleString('id-ID')}</td></tr>`).join('') || `<tr><td colspan="2" style="text-align:center;padding:10px;">Tidak ada komitmen di bulan ini.</td></tr>`)
+    + `<tr class="total-row"><td class="name">TOTAL</td><td>${totalPort.toLocaleString('id-ID')}</td></tr>`;
 }
-let pt3fhCommitTableWired = false;
 function pt3fhSetupCommitDropdown(){
   const sel = document.getElementById('pt3fhCommitMonth');
   if(!sel) return;
@@ -9565,7 +9147,7 @@ function renderKomitmenGLPage(){
 
   renderKomitmenGLSection('hem', hemAGG.rows, 'Komitmen Golive', hemGet,
     (r)=> hemStripStatusPrefix(hemGet(r,'Progress Lapangan') || 'Tidak Diketahui').toUpperCase(), progressStageSortIndex);
-  renderKomitmenGLSection('olo', oloAGG.rows, 'Komitmen Golive', oloGet,
+  renderKomitmenGLSection('olo', oloAGG.rows, 'NEW KOMITMEN GL', oloGet,
     (r)=> hemStripStatusPrefix(oloRowProgressLabel(r)).toUpperCase(), progressStageSortIndex);
   renderKomitmenGLSection('mbb', mbbAGG.rows, 'TGL COMMIT OA FIX', mbbGet,
     (r)=> hemStripStatusPrefix(mbbRowStatusLabel(r)).toUpperCase(), progressStageSortIndex);
@@ -9575,7 +9157,7 @@ function renderKomitmenGLPage(){
     (r)=> hemStripStatusPrefix(pt3fhRowStatusLabel(r)).toUpperCase(), pt3fhStageOrderIndex, (r)=> pt3fhParseNum(pt3fhGet(r,'PORT PLAN')));
 
   renderKomitmenTrendChart('hemGLTrendChart', 'hemGLTrendSummary', hemAGG.rows, hemGet, 'Komitmen Golive', (row)=> hemCategoryOfLabel(hemRowProgressLabel(row)));
-  renderKomitmenTrendChart('oloGLTrendChart', 'oloGLTrendSummary', oloAGG.rows, oloGet, 'Komitmen Golive', (row)=> hemCategoryOfLabel(oloRowProgressLabel(row)));
+  renderKomitmenTrendChart('oloGLTrendChart', 'oloGLTrendSummary', oloAGG.rows, oloGet, 'NEW KOMITMEN GL', (row)=> hemCategoryOfLabel(oloRowProgressLabel(row)));
   renderKomitmenTrendChart('mbbGLTrendChart', 'mbbGLTrendSummary', mbbAGG.rows, mbbGet, 'TGL COMMIT OA FIX', (row)=> mbbFiOaOgp(row));
   renderKomitmenTrendChart('pt3GLTrendChart', 'pt3GLTrendSummary', pt3AGG.rows, pt3Get, 'KOMITMEN GOLIVE', (row)=> pt3Category(row));
   renderKomitmenTrendChart('pt3fhGLTrendChart', 'pt3fhGLTrendSummary', pt3fhAGG.rows, pt3fhGet, 'KOMITMEN GOLIVE', (row)=> pt3fhCategory(row));
@@ -9669,7 +9251,7 @@ function setupChecklistMonth(prefix, monthState, onChange){
 
 const oloChecklistMonthState = { value: new Date().getMonth() };
 function renderOloChecklistPage(){
-  renderChecklistSection('olo', oloAGG ? oloAGG.rows : [], 'Komitmen Golive', oloGet, 'Ceklist OLO Sumbagut',
+  renderChecklistSection('olo', oloAGG ? oloAGG.rows : [], 'NEW KOMITMEN GL', oloGet, 'Ceklist OLO Sumbagut',
     (row)=> hemStripStatusPrefix(oloRowProgressLabel(row)).toUpperCase(),
     (row)=> row ? [oloGet(row,'IHLD'), oloGet(row,'NO ORDER'), oloGet(row,'NAMA PROYEK'), oloGet(row,'DISTRICT'), oloGet(row,'STO'), oloGet(row,'NDE WORK ORDER KE TA')] : [1,1,1,1,1,1],
     oloChecklistMonthState);
@@ -9695,9 +9277,6 @@ if(hemChecklistCaptureBtn) hemChecklistCaptureBtn.onclick = ()=> captureAreaForP
    Narik SEMUA baris hasil filter (bukan cuma halaman yang lagi
    ke-render), soalnya tabelnya pakai pagination.
    ============================================================ */
-document.getElementById('rxonuKendalaFeedingDownloadBtn').onclick = ()=> downloadRxonuKendala('rxonuKendalaTableBody', 'klasifikasi-rxonu-kendala-feeding-pt2.csv');
-document.getElementById('rxonuKendalaLapPt2DownloadBtn').onclick = ()=> downloadRxonuKendala('rxonuKendalaLapPt2TableBody', 'klasifikasi-rxonu-kendala-pt2.csv');
-
 document.getElementById('hemDownloadBtn').onclick = ()=>{
   downloadRowsAsCsv('daftar-work-order-hem.csv', [
     {label:'IHLD', get:r=>hemGet(r,'IHLD')},
@@ -9731,7 +9310,7 @@ document.getElementById('oloDownloadBtn').onclick = ()=>{
     {label:'Panjang Kabel (m)', get:r=>oloGet(r,'Panjang Kabel (m)')},
     {label:'NDE Work Order', get:r=>oloGet(r,'NDE WORK ORDER KE TA')},
     {label:'Tanggal Order', get:r=>oloGet(r,'TANGGAL ORDER')},
-    {label:'Komitmen Golive', get:r=>oloGet(r,'Komitmen Golive')},
+    {label:'New Komitmen GL', get:r=>oloGet(r,'NEW KOMITMEN GL')},
     {label:'Detail Progres', get:r=>oloGet(r,'Detail Progres')},
     {label:'TTD', get:r=>oloGet(r,'TTD')},
     {label:'BOQ', get:r=>oloGet(r,'BOQ')},
@@ -9889,7 +9468,7 @@ function renderOloNeedOltPage(){
       <td>${oloGet(row,'STO')||'—'}</td>
       <td>${oloGet(row,'TANGGAL ORDER')||'—'}</td>
       <td>${oloGet(row,'Progress Lapangan')||'—'}</td>
-      <td>${oloGet(row,'Komitmen Golive')||'—'}</td>
+      <td>${oloGet(row,'NEW KOMITMEN GL')||'—'}</td>
       <td>${oloGet(row,'SUB STATUS')||'—'}</td>
     </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:24px;">Tidak ada order dengan kendala ini.</td></tr>`;
 }
@@ -9938,7 +9517,7 @@ document.getElementById('oloNeedOltDownloadBtn').onclick = ()=>{
     {label:'STO', get:r=>oloGet(r,'STO')},
     {label:'Tanggal Order', get:r=>oloGet(r,'TANGGAL ORDER')},
     {label:'Progres Lapangan', get:r=>oloGet(r,'Progress Lapangan')},
-    {label:'Komitmen Golive', get:r=>oloGet(r,'Komitmen Golive')},
+    {label:'New Komitmen GL', get:r=>oloGet(r,'NEW KOMITMEN GL')},
     {label:'Sub Status', get:r=>oloGet(r,'SUB STATUS')},
   ], rows);
 };
@@ -10303,118 +9882,6 @@ document.getElementById('goliveDownloadBtn').onclick = ()=>{
 };
 
 goliveLoadDataAuto();
-
-/* ============================================================
-   Halaman "WISA" — upload foto, otomatis tersimpan ke Google Drive
-   lewat Apps Script (WRITE_API_URL yang sama dipakai buat Catatan/
-   Status PT1), jadi kefoto yang sama muncul buat SEMUA orang yang
-   buka dashboard, bukan cuma browser sendiri.
-   ============================================================ */
-async function wisaLoadPhoto(){
-  const metaEl = document.getElementById('wisaPhotoMeta');
-  const imgEl = document.getElementById('wisaPhotoImg');
-  const emptyEl = document.getElementById('wisaEmptyState');
-  if(!imgEl) return;
-
-  try{
-    const url = WRITE_API_URL + '?action=getWisaPhoto';
-    const res = await universalFetch(url, {cache:'no-store'});
-    const data = await res.json();
-    if(data.ok && data.url){
-      imgEl.src = data.url;
-      imgEl.style.display = 'block';
-      if(emptyEl) emptyEl.style.display = 'none';
-      if(metaEl) metaEl.textContent = data.uploadedAt ? `Terakhir diupdate: ${data.uploadedAt}` : '';
-    }else{
-      imgEl.style.display = 'none';
-      if(emptyEl) emptyEl.style.display = 'block';
-      if(metaEl) metaEl.textContent = '';
-    }
-  }catch(err){
-    console.error('Gagal ambil foto WISA:', err.message);
-    if(emptyEl){ emptyEl.style.display = 'block'; emptyEl.textContent = 'Gagal memuat foto. Coba refresh halaman.'; }
-  }
-}
-
-function wisaFileToBase64(file){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      const dataUrl = reader.result; // format "data:image/png;base64,XXXXX"
-      const img = new Image();
-      img.onload = ()=>{
-        // Resize biar gak kegedean (upload lewat GET chunk, makin kecil makin cepat)
-        const MAX_DIM = 1600;
-        let { width, height } = img;
-        if(width > MAX_DIM || height > MAX_DIM){
-          const scale = MAX_DIM / Math.max(width, height);
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        const resizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        resolve(resizedDataUrl.split(',')[1]);
-      };
-      img.onerror = ()=> resolve(dataUrl.split(',')[1]); // kalau gagal di-resize, pakai aslinya aja
-      img.src = dataUrl;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-document.getElementById('wisaUploadBtn').onclick = async ()=>{
-  const fileInput = document.getElementById('wisaFileInput');
-  const statusEl = document.getElementById('wisaUploadStatus');
-  const file = fileInput.files[0];
-  if(!file){
-    if(statusEl){ statusEl.textContent = 'Pilih file foto dulu.'; statusEl.style.color = 'var(--red)'; }
-    return;
-  }
-  if(statusEl){ statusEl.textContent = 'Menyiapkan foto...'; statusEl.style.color = 'var(--amber)'; }
-
-  try{
-    const base64Data = await wisaFileToBase64(file);
-
-    // Upload lewat GET yang dipecah jadi beberapa "chunk" kecil — bukan POST,
-    // soalnya POST ke Apps Script suka gagal kalau dashboard dibuka dari
-    // localhost. GET terbukti selalu jalan lancar (sama kayak fitur Catatan).
-    const CHUNK_SIZE = 3000; // dikecilin biar aman dari batas panjang URL (base64 kena encode +/=/ jadi bisa lebih panjang)
-    const totalChunks = Math.ceil(base64Data.length / CHUNK_SIZE) || 1;
-    const sessionId = 'wisa_' + Date.now() + '_' + Math.random().toString(36).slice(2,8);
-
-    for(let i=0; i<totalChunks; i++){
-      if(statusEl) statusEl.textContent = `Mengupload... (${i+1}/${totalChunks})`;
-      const chunk = base64Data.slice(i*CHUNK_SIZE, (i+1)*CHUNK_SIZE);
-      const url = WRITE_API_URL + '?action=uploadWisaChunk&sessionId=' + encodeURIComponent(sessionId) + '&chunkIndex=' + i + '&data=' + encodeURIComponent(chunk);
-      const res = await universalFetch(url, {cache:'no-store'});
-      const data = await res.json();
-      if(!data.ok) throw new Error('Gagal upload bagian ke-' + (i+1) + ': ' + (data.error||'unknown error'));
-    }
-
-    if(statusEl) statusEl.textContent = 'Menyelesaikan upload...';
-    const finishUrl = WRITE_API_URL + '?action=finishWisaUpload&sessionId=' + encodeURIComponent(sessionId)
-      + '&totalChunks=' + totalChunks
-      + '&filename=' + encodeURIComponent(file.name.replace(/\.[^.]+$/, '') + '.jpg')
-      + '&mimeType=' + encodeURIComponent('image/jpeg'); // selalu JPEG, soalnya udah diresize/dikonversi lewat canvas
-    const finishRes = await universalFetch(finishUrl, {cache:'no-store'});
-    const data = await finishRes.json();
-
-    if(data.ok){
-      if(statusEl){ statusEl.textContent = '✅ Berhasil diupload!'; statusEl.style.color = 'var(--emerald)'; }
-      fileInput.value = '';
-      wisaLoadPhoto();
-    }else{
-      if(statusEl){ statusEl.textContent = '❌ Gagal: ' + (data.error||'unknown error'); statusEl.style.color = 'var(--red)'; }
-    }
-  }catch(err){
-    if(statusEl){ statusEl.textContent = '❌ Gagal upload: ' + err.message; statusEl.style.color = 'var(--red)'; }
-  }
-};
-
-wisaLoadPhoto();
 
 hemLoadDataAuto();
 oloLoadDataAuto();
